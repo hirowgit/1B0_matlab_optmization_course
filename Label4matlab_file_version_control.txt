@@ -1,0 +1,24 @@
+Label for matlab file version control 
+organized by H. Wagatsuma
+~~~~~~~~~~~~~~
+(start)
+Normal 
+Plus
+Advanced
+Bronze
+Copper 
+Silver
+Gold
+Platimum
+Palladium
+Triangle
+Square
+Pentagon
+Hexagon
+Heptagon
+Octagon
+Enneagon
+Decagon
+Hendecagon
+Dodecagon
+...

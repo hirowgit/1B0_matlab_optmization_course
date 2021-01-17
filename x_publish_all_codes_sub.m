@@ -49,7 +49,8 @@ for i=2:length(suffST)   % (For doc and ppt error may happen in publish in some 
         publish(f_name2{1},'format',suffST{i},'outputDir',this_file_tag);
         fprintf('successfully published as %s files ! See in folder "%s".\r\n',typeST{i},this_file_tag);
     catch
-        fprintf('sfailed to publish into %s files ...\r\n',typeST{i});
+        i
+        fprintf('failed to publish into %s files ...\r\n',typeST{i});
     end
 
 end

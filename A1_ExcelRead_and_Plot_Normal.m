@@ -1,10 +1,8 @@
-this_file_tag='A1_ExcelRead_and_Plot_Normal';
-
 %% MATLAB programming course for beginners, supported by Wagatsuma Lab@Kyutech 
 %
 % /* 
 % The MIT License (MIT): 
-% Copyright (c) 2020 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech
+% Copyright (c) 2021 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech
 % 
 % Permission is hereby granted, free of charge, to any person obtaining a
 % copy of this software and associated documentation files (the
@@ -25,33 +23,53 @@ this_file_tag='A1_ExcelRead_and_Plot_Normal';
 % OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 % USE OR OTHER DEALINGS IN THE SOFTWARE. */
 %% Specifications and requirements
-% # @Time    : 2020-4-20 
+% # @Time    : 2021-1-16 
 % # @Author  : Hiroaki Wagatsuma
-% # @Site    : https://github.com/hirowgit/1_matlab_basic_course
+% # @Site    : https://github.com/hirowgit/1B0_matla_optmization_course
 % # @IDE     : MATLAB R2018a
-% # @File    : x_publish_each_codes.m
+% # @File    : A1_ExcelRead_and_Plot_Normal.m
 
 %%  Main program
-%%  Publish individual codes and thier results
-suffST={'m','html','pdf','latex','xml','doc','ppt'}; typeST={'MATLAB','HTML','PDF','LaTeX','XML','Microsoft Word','Microsoft PowerPoint'}; 
+% clear all;
+clc
 
-try    
-    f_name(1:length(suffST))={this_file_tag};
-    f_name2=cellfun(@(s1,s2) [s1,'.',s2],f_name,suffST,'UniformOutput',false);
-    currT=clock; date_stamp=sprintf("%d/%d/%d",currT(1:3)); 
-catch
-    disp('Please do not delete the first line with "this_file_tag" ')
+dataF='output';
+fname='to_csv2.csv';
+dname='Mdat';
+
+Mdat=readtable(fullfile(dataF,fname));
+lineD={};
+
+Mdat.Properties
+size(Mdat)
+varnames=Mdat.Properties.VariableNames;
+varnames
+j=1;
+Lsize=(size(Mdat,2)-1)/2;
+for k=1:Lsize
+    strLx=['x',num2str(k),'=',dname,'.',varnames{k*2}];
+    strLy=['y',num2str(k),'=',dname,'.',varnames{k*2+1}];
+    eval(strLx); eval(strLy);
+    
+    strLx=['lineD{',num2str(k),'}(:,1)=',dname,'.',varnames{k*2}];
+    strLy=['lineD{',num2str(k),'}(:,2)=',dname,'.',varnames{k*2+1}];
+    eval(strLx); eval(strLy);
+    
 end
 
-if ~exist(this_file_tag,'dir'); mkdir(this_file_tag); end
-for i=2:length(suffST)   % (For doc and ppt error may happen in publish in some platform like mac) 
-    try
-        publish(f_name2{1},'format',suffST{i},'outputDir',this_file_tag);
-        fprintf('successfully published as %s files ! See in folder "%s".\r\n',typeST{i},this_file_tag);
-    catch
-        fprintf('failed to publish into %s files ...\r\n',typeST{i});
-    end
-
+for k=1:Lsize
+    Dedge=find(lineD{k}(:,1)>0 & lineD{k}(:,1)>0);
+    mD=max(Dedge);
+    lineD2{k}=[lineD{k}(1:mD,1) lineD{k}(1:mD,2)];
+%     lineD{k}(:,1)=find(lineD{k}(:,1)
 end
-web([this_file_tag,'/',f_name2{2}]);
-%%
+
+figure(1); clf
+colM=colormap(lines(Lsize));
+for k=1:Lsize
+    pdata=lineD2{k};
+    plot(pdata(:,1),pdata(:,2),'color',colM(k,:),'LineWidth',2), hold on;
+end
+myXlim=get(gca,'xlim'); myYlim=get(gca,'ylim');
+set(gca,'xlim',myXlim+[-10 10],'ylim',myYlim+[-10 10]);
+grid on; xlabel('x','FontSize',12); ylabel('y','FontSize',12)

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mscript xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <version>9.4</version>
+   <release>2018a</release>
+   <date>2021-01-17</date>
+   <cell style="overview">
+      <count>1</count>
+      <steptitle style="document">MATLAB programming course for beginners, supported by Wagatsuma Lab@Kyutech</steptitle>
+      <text>
+         <p>/* The MIT License (MIT): Copyright (c) 2021 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech</p>
+         <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+         <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+         <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */</p>
+      </text>
+      <cellOutputTarget>1</cellOutputTarget>
+   </cell>
+   <cell>
+      <count>2</count>
+      <steptitle>Specifications and requirements</steptitle>
+      <text>
+         <ol>
+            <li>@Time    : 2021-1-16</li>
+            <li>@Author  : Hiroaki Wagatsuma</li>
+            <li>@Site    : https://github.com/hirowgit/1B0_matla_optmization_course</li>
+            <li>@IDE     : MATLAB R2018a</li>
+            <li>@File    : A2_Object_Move_Normal.m</li>
+         </ol>
+      </text>
+      <cellOutputTarget>2</cellOutputTarget>
+   </cell>
+   <cell>
+      <count>3</count>
+      <steptitle>Main program</steptitle>
+      <text>
+         <p>clear all</p>
+      </text>
+      <mcode>clc
+
+Nd=10;
+vehi=[0,1,1,-1,-1,0;2,1,-1,-1,1,2]; % vehi originally in
+% "Robot Modeling" by Kazuyuki Kobayashi (ISBN 978-4-274-20431-9) https://www.ohmsha.co.jp/book/9784274204319/
+contr=[-0.15,0.15,0.7,0.7,-0.7,-0.7,-0.15,-0.15,0.15,0.15;1,1,1,-1,-1,1,1,-1,-1,1];
+
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1)-pi/2;
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1);
+RotM=@(theta) [cos(theta),-sin(theta);sin(theta),cos(theta)];
+
+% Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+
+xS=100; yS=100;
+yPos=repmat(yS,[1,Nd]);
+xPos=(1:Nd)+xS;
+sTraj=[xPos' yPos'];
+
+figure(1); clf
+
+plot(sTraj(:,1),sTraj(:,2),'.-','lineWidth',2,'MarkerSize',20);
+grid on;
+
+figure(2); clf;
+
+plot(contr(1,:),contr(2,:),'.-','lineWidth',2,'MarkerSize',20);
+axis equal;
+
+figure(3); clf;
+for k=1:Nd-1
+    x1=sTraj(k,1); y1=sTraj(k,2);
+    x2=sTraj(k+1,1); y2=sTraj(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),'.-','lineWidth',2,'MarkerSize',20),hold on;
+
+%     set(gca,'xlim',[100 110],'ylim',[100 110]);
+%     set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))],'ylim',[min(sTraj(:,2)) max(sTraj(:,2))+10]);
+    set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))]);
+    plot(sTraj(:,1),sTraj(:,2),'.-','lineWidth',2,'MarkerSize',20);
+    plot([x1,x2],[y1,y2],'k.-','lineWidth',2,'MarkerSize',20);
+    axis equal;
+    pause(0.2);
+    drawnow;
+    hold off
+end
+
+Nd=10*4;
+tAng=0:((2*pi)./Nd):2*pi;
+
+Radi=20;
+sTraj=[Radi.*cos(tAng)' Radi.*sin(tAng)'];
+
+figure(31);clf;
+plot(sTraj);
+figure(4); clf;
+
+for k=1:Nd-1
+    x1=sTraj(k,1); y1=sTraj(k,2);
+    x2=sTraj(k+1,1); y2=sTraj(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),'.-','lineWidth',2,'MarkerSize',20),hold on;
+
+%     set(gca,'xlim',[100 110],'ylim',[100 110]);
+    set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))],'ylim',[min(sTraj(:,2)) max(sTraj(:,2))]);
+%     set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))]);
+    plot(sTraj(:,1),sTraj(:,2),'.-','lineWidth',2,'MarkerSize',20);
+    plot([x1,x2],[y1,y2],'k.-','lineWidth',2,'MarkerSize',20);
+    axis equal;
+    pause(0.2);
+    drawnow;
+    hold off
+end</mcode>
+      <mcode-xmlized>
+         <mwsh:code xml:space="preserve">clc
+
+Nd=10;
+vehi=[0,1,1,-1,-1,0;2,1,-1,-1,1,2]; <mwsh:comments xml:space="preserve">% vehi originally in</mwsh:comments><mwsh:comments xml:space="preserve">% "Robot Modeling" by Kazuyuki Kobayashi (ISBN 978-4-274-20431-9) https://www.ohmsha.co.jp/book/9784274204319/</mwsh:comments>
+contr=[-0.15,0.15,0.7,0.7,-0.7,-0.7,-0.15,-0.15,0.15,0.15;1,1,1,-1,-1,1,1,-1,-1,1];
+
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1)-pi/2;
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1);
+RotM=@(theta) [cos(theta),-sin(theta);sin(theta),cos(theta)];
+
+<mwsh:comments xml:space="preserve">% Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);</mwsh:comments>
+
+xS=100; yS=100;
+yPos=repmat(yS,[1,Nd]);
+xPos=(1:Nd)+xS;
+sTraj=[xPos' yPos'];
+
+figure(1); clf
+
+plot(sTraj(:,1),sTraj(:,2),<mwsh:strings xml:space="preserve">'.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20);
+grid <mwsh:strings xml:space="preserve">on</mwsh:strings>;
+
+figure(2); clf;
+
+plot(contr(1,:),contr(2,:),<mwsh:strings xml:space="preserve">'.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20);
+axis <mwsh:strings xml:space="preserve">equal</mwsh:strings>;
+
+figure(3); clf;
+<mwsh:keywords xml:space="preserve">for</mwsh:keywords> k=1:Nd-1
+    x1=sTraj(k,1); y1=sTraj(k,2);
+    x2=sTraj(k+1,1); y2=sTraj(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),<mwsh:strings xml:space="preserve">'.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20),hold <mwsh:strings xml:space="preserve">on</mwsh:strings>;
+
+<mwsh:comments xml:space="preserve">%     set(gca,'xlim',[100 110],'ylim',[100 110]);</mwsh:comments><mwsh:comments xml:space="preserve">%     set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))],'ylim',[min(sTraj(:,2)) max(sTraj(:,2))+10]);</mwsh:comments>
+    set(gca,<mwsh:strings xml:space="preserve">'xlim'</mwsh:strings>,[min(sTraj(:,1)) max(sTraj(:,1))]);
+    plot(sTraj(:,1),sTraj(:,2),<mwsh:strings xml:space="preserve">'.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20);
+    plot([x1,x2],[y1,y2],<mwsh:strings xml:space="preserve">'k.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20);
+    axis <mwsh:strings xml:space="preserve">equal</mwsh:strings>;
+    pause(0.2);
+    drawnow;
+    hold <mwsh:strings xml:space="preserve">off</mwsh:strings><mwsh:keywords xml:space="preserve">end</mwsh:keywords>
+
+Nd=10*4;
+tAng=0:((2*pi)./Nd):2*pi;
+
+Radi=20;
+sTraj=[Radi.*cos(tAng)' Radi.*sin(tAng)'];
+
+figure(31);clf;
+plot(sTraj);
+figure(4); clf;
+
+<mwsh:keywords xml:space="preserve">for</mwsh:keywords> k=1:Nd-1
+    x1=sTraj(k,1); y1=sTraj(k,2);
+    x2=sTraj(k+1,1); y2=sTraj(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),<mwsh:strings xml:space="preserve">'.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20),hold <mwsh:strings xml:space="preserve">on</mwsh:strings>;
+
+<mwsh:comments xml:space="preserve">%     set(gca,'xlim',[100 110],'ylim',[100 110]);</mwsh:comments>
+    set(gca,<mwsh:strings xml:space="preserve">'xlim'</mwsh:strings>,[min(sTraj(:,1)) max(sTraj(:,1))],<mwsh:strings xml:space="preserve">'ylim'</mwsh:strings>,[min(sTraj(:,2)) max(sTraj(:,2))]);
+<mwsh:comments xml:space="preserve">%     set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))]);</mwsh:comments>
+    plot(sTraj(:,1),sTraj(:,2),<mwsh:strings xml:space="preserve">'.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20);
+    plot([x1,x2],[y1,y2],<mwsh:strings xml:space="preserve">'k.-'</mwsh:strings>,<mwsh:strings xml:space="preserve">'lineWidth'</mwsh:strings>,2,<mwsh:strings xml:space="preserve">'MarkerSize'</mwsh:strings>,20);
+    axis <mwsh:strings xml:space="preserve">equal</mwsh:strings>;
+    pause(0.2);
+    drawnow;
+    hold <mwsh:strings xml:space="preserve">off</mwsh:strings><mwsh:keywords xml:space="preserve">end</mwsh:keywords></mwsh:code></mcode-xmlized>
+      <mcode-count>1</mcode-count>
+      <cellOutputTarget>3</cellOutputTarget>
+      <img src="A2_Object_Move_Normal_01.png"/>
+      <img src="A2_Object_Move_Normal_02.png"/>
+      <img src="A2_Object_Move_Normal_03.png"/>
+      <img src="A2_Object_Move_Normal_04.png"/>
+      <img src="A2_Object_Move_Normal_05.png"/>
+   </cell>
+   <originalCode>%% MATLAB programming course for beginners, supported by Wagatsuma Lab@Kyutech 
+%
+% /* 
+% The MIT License (MIT): 
+% Copyright (c) 2021 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech
+% 
+% Permission is hereby granted, free of charge, to any person obtaining a
+% copy of this software and associated documentation files (the
+% "Software"), to deal in the Software without restriction, including
+% without limitation the rights to use, copy, modify, merge, publish,
+% distribute, sublicense, and/or sell copies of the Software, and to permit
+% persons to whom the Software is furnished to do so, subject to the
+% following conditions:
+% 
+% The above copyright notice and this permission notice shall be included
+% in all copies or substantial portions of the Software.
+% 
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+% OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+% NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+% DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+% OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+% USE OR OTHER DEALINGS IN THE SOFTWARE. */
+%% Specifications and requirements
+% # @Time    : 2021-1-16 
+% # @Author  : Hiroaki Wagatsuma
+% # @Site    : https://github.com/hirowgit/1B0_matla_optmization_course
+% # @IDE     : MATLAB R2018a
+% # @File    : A2_Object_Move_Normal.m
+
+%%  Main program
+% clear all
+clc
+
+Nd=10;
+vehi=[0,1,1,-1,-1,0;2,1,-1,-1,1,2]; % vehi originally in 
+% "Robot Modeling" by Kazuyuki Kobayashi (ISBN 978-4-274-20431-9) https://www.ohmsha.co.jp/book/9784274204319/
+contr=[-0.15,0.15,0.7,0.7,-0.7,-0.7,-0.15,-0.15,0.15,0.15;1,1,1,-1,-1,1,1,-1,-1,1];
+
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1)-pi/2;
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1);
+RotM=@(theta) [cos(theta),-sin(theta);sin(theta),cos(theta)];
+
+% Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+
+xS=100; yS=100;
+yPos=repmat(yS,[1,Nd]);
+xPos=(1:Nd)+xS;
+sTraj=[xPos' yPos'];
+
+figure(1); clf
+
+plot(sTraj(:,1),sTraj(:,2),'.-','lineWidth',2,'MarkerSize',20);
+grid on;
+
+figure(2); clf;
+
+plot(contr(1,:),contr(2,:),'.-','lineWidth',2,'MarkerSize',20);
+axis equal;
+
+figure(3); clf;
+for k=1:Nd-1
+    x1=sTraj(k,1); y1=sTraj(k,2);
+    x2=sTraj(k+1,1); y2=sTraj(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),'.-','lineWidth',2,'MarkerSize',20),hold on;
+    
+%     set(gca,'xlim',[100 110],'ylim',[100 110]);
+%     set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))],'ylim',[min(sTraj(:,2)) max(sTraj(:,2))+10]);
+    set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))]);
+    plot(sTraj(:,1),sTraj(:,2),'.-','lineWidth',2,'MarkerSize',20);
+    plot([x1,x2],[y1,y2],'k.-','lineWidth',2,'MarkerSize',20);
+    axis equal; 
+    pause(0.2);
+    drawnow;
+    hold off
+end
+
+Nd=10*4;
+tAng=0:((2*pi)./Nd):2*pi;
+
+Radi=20;
+sTraj=[Radi.*cos(tAng)' Radi.*sin(tAng)'];
+
+figure(31);clf;
+plot(sTraj);
+figure(4); clf;
+
+for k=1:Nd-1
+    x1=sTraj(k,1); y1=sTraj(k,2);
+    x2=sTraj(k+1,1); y2=sTraj(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),'.-','lineWidth',2,'MarkerSize',20),hold on;
+    
+%     set(gca,'xlim',[100 110],'ylim',[100 110]);
+    set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))],'ylim',[min(sTraj(:,2)) max(sTraj(:,2))]);
+%     set(gca,'xlim',[min(sTraj(:,1)) max(sTraj(:,1))]);
+    plot(sTraj(:,1),sTraj(:,2),'.-','lineWidth',2,'MarkerSize',20);
+    plot([x1,x2],[y1,y2],'k.-','lineWidth',2,'MarkerSize',20);
+    axis equal; 
+    pause(0.2);
+    drawnow;
+    hold off
+end
+</originalCode>
+   <m-file>A2_Object_Move_Normal</m-file>
+   <filename>/Users/hiro/Documents/github/1B0_matla_optmization_course/A2_Object_Move_Normal.m</filename>
+   <outputdir>/Users/hiro/Documents/github/1B0_matla_optmization_course/A2_Object_Move_Normal</outputdir>
+</mscript>

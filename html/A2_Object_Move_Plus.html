@@ -1,0 +1,245 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>MATLAB programming course for beginners, supported by Wagatsuma Lab@Kyutech</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-01-17"><meta name="DC.source" content="A2_Object_Move_Plus.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>MATLAB programming course for beginners, supported by Wagatsuma Lab@Kyutech</h1><!--introduction--><p>/* The MIT License (MIT): Copyright (c) 2021 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Specifications and requirements</a></li><li><a href="#2">Main program</a></li></ul></div><h2 id="1">Specifications and requirements</h2><div><ol><li>@Time    : 2021-1-16</li><li>@Author  : Hiroaki Wagatsuma</li><li>@Site    : https://github.com/hirowgit/1B0_matla_optmization_course</li><li>@IDE     : MATLAB R2018a</li><li>@File    : A2_Object_Move_Plus.m</li></ol></div><h2 id="2">Main program</h2><pre class="codeinput">clear <span class="string">all</span>
+clc
+
+contr=[-0.15,0.15,0.7,0.7,-0.7,-0.7,-0.15,-0.15,0.15,0.15;1,1,1,-1,-1,1,1,-1,-1,1];
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1);
+RotM=@(theta) [cos(theta),-sin(theta);sin(theta),cos(theta)];
+
+<span class="comment">% Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);</span>
+
+
+Ndstep=10;
+Nd=7;
+Radi=2*4*Ndstep/(2*pi);
+Radi=4*Radi;
+
+prange=pi/2;
+
+dAng=prange*(Ndstep./(2*pi*Radi*(prange./(2*pi))));
+<span class="comment">% \delta \theta=R_p \cdot \frac{N_d}{2\pi r \frac{R_p}{2\pi}}\\ R_p=prange, \\ N_d=Ndstep</span>
+tAng=0:(dAng):prange;
+tAng=fliplr(tAng);
+
+sTraj=[(Radi.*cos(tAng))' (Radi.*sin(tAng))'];
+sTraj_full=sTraj;
+
+xS=0; yS=Radi;
+yPos=repmat(yS,[1,(Nd+1)]);
+xPos=-(0:Ndstep:(Nd+1)*Ndstep)+xS;
+sTraj=[xPos(2:Nd+1)' yPos(2:Nd+1)'];
+sTraj_full=[flipud(sTraj); sTraj_full];
+
+xS=Radi; yS=0;
+xPos=repmat(xS,[1,(Nd+1)]);
+yPos=-(0:Ndstep:(Nd+1)*Ndstep)+yS;
+sTraj=[xPos(2:Nd+1)' yPos(2:Nd+1)'];
+sTraj_full=[sTraj_full; sTraj];
+
+
+figure(1); clf
+
+plot(sTraj_full(:,1),sTraj_full(:,2),<span class="string">'.-'</span>,<span class="string">'lineWidth'</span>,2,<span class="string">'MarkerSize'</span>,20);
+axis <span class="string">equal</span>;
+grid <span class="string">on</span>;
+title(<span class="string">'Trajectory'</span>);
+xlabel(<span class="string">'x'</span>); ylabel(<span class="string">'y'</span>);
+
+figure(31);clf;
+plot(sTraj_full,<span class="string">'.-'</span>);
+grid <span class="string">on</span>;
+title(<span class="string">'Temporal sequence of x and y coordinates to reconstract the trajectory'</span>);
+xlabel(<span class="string">'x'</span>); ylabel(<span class="string">'y'</span>);
+
+figure(4); clf;
+
+marginR=[-20 20];
+<span class="keyword">for</span> k=1:size(sTraj_full,1)-1
+    x1=sTraj_full(k,1); y1=sTraj_full(k,2);
+    x2=sTraj_full(k+1,1); y2=sTraj_full(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),<span class="string">'.-'</span>,<span class="string">'lineWidth'</span>,2,<span class="string">'MarkerSize'</span>,20),hold <span class="string">on</span>;
+
+    set(gca,<span class="string">'xlim'</span>,[min(sTraj_full(:,1)) max(sTraj_full(:,1))]+marginR,<span class="string">'ylim'</span>,[min(sTraj_full(:,2)) max(sTraj_full(:,2))]+marginR);
+    plot(sTraj_full(:,1),sTraj_full(:,2),<span class="string">'.-'</span>,<span class="string">'lineWidth'</span>,2,<span class="string">'MarkerSize'</span>,20);
+    plot([x1,x2],[y1,y2],<span class="string">'k.-'</span>,<span class="string">'lineWidth'</span>,2,<span class="string">'MarkerSize'</span>,20);
+    axis <span class="string">equal</span>; grid <span class="string">on</span>; xlabel(<span class="string">'x'</span>); ylabel(<span class="string">'y'</span>);
+    title(<span class="string">'Object movement in the trajectory'</span>);
+    pause(0.2);
+    drawnow;
+    hold <span class="string">off</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="A2_Object_Move_Plus_01.png" alt=""> <img vspace="5" hspace="5" src="A2_Object_Move_Plus_02.png" alt=""> <img vspace="5" hspace="5" src="A2_Object_Move_Plus_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MATLAB programming course for beginners, supported by Wagatsuma Lab@Kyutech 
+%
+% /* 
+% The MIT License (MIT): 
+% Copyright (c) 2021 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech
+% 
+% Permission is hereby granted, free of charge, to any person obtaining a
+% copy of this software and associated documentation files (the
+% "Software"), to deal in the Software without restriction, including
+% without limitation the rights to use, copy, modify, merge, publish,
+% distribute, sublicense, and/or sell copies of the Software, and to permit
+% persons to whom the Software is furnished to do so, subject to the
+% following conditions:
+% 
+% The above copyright notice and this permission notice shall be included
+% in all copies or substantial portions of the Software.
+% 
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+% OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+% NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+% DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+% OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+% USE OR OTHER DEALINGS IN THE SOFTWARE. */
+%% Specifications and requirements
+% # @Time    : 2021-1-16 
+% # @Author  : Hiroaki Wagatsuma
+% # @Site    : https://github.com/hirowgit/1B0_matla_optmization_course
+% # @IDE     : MATLAB R2018a
+% # @File    : A2_Object_Move_Plus.m
+
+%%  Main program
+clear all
+clc
+
+contr=[-0.15,0.15,0.7,0.7,-0.7,-0.7,-0.15,-0.15,0.15,0.15;1,1,1,-1,-1,1,1,-1,-1,1];
+gAng=@(x1,y1,x2,y2) atan2(y2-y1,x2-x1);
+RotM=@(theta) [cos(theta),-sin(theta);sin(theta),cos(theta)];
+
+% Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+
+
+Ndstep=10;
+Nd=7;
+Radi=2*4*Ndstep/(2*pi);
+Radi=4*Radi;
+
+prange=pi/2;
+
+dAng=prange*(Ndstep./(2*pi*Radi*(prange./(2*pi))));  
+% \delta \theta=R_p \cdot \frac{N_d}{2\pi r \frac{R_p}{2\pi}}\\ R_p=prange, \\ N_d=Ndstep
+tAng=0:(dAng):prange;
+tAng=fliplr(tAng);
+
+sTraj=[(Radi.*cos(tAng))' (Radi.*sin(tAng))'];  
+sTraj_full=sTraj;
+
+xS=0; yS=Radi;
+yPos=repmat(yS,[1,(Nd+1)]);
+xPos=-(0:Ndstep:(Nd+1)*Ndstep)+xS;
+sTraj=[xPos(2:Nd+1)' yPos(2:Nd+1)'];
+sTraj_full=[flipud(sTraj); sTraj_full];
+
+xS=Radi; yS=0;
+xPos=repmat(xS,[1,(Nd+1)]);
+yPos=-(0:Ndstep:(Nd+1)*Ndstep)+yS;
+sTraj=[xPos(2:Nd+1)' yPos(2:Nd+1)'];
+sTraj_full=[sTraj_full; sTraj];
+
+
+figure(1); clf
+
+plot(sTraj_full(:,1),sTraj_full(:,2),'.-','lineWidth',2,'MarkerSize',20);
+axis equal;
+grid on;
+title('Trajectory');
+xlabel('x'); ylabel('y');
+
+figure(31);clf;
+plot(sTraj_full,'.-');
+grid on;
+title('Temporal sequence of x and y coordinates to reconstract the trajectory');
+xlabel('x'); ylabel('y');
+
+figure(4); clf;
+
+marginR=[-20 20];
+for k=1:size(sTraj_full,1)-1
+    x1=sTraj_full(k,1); y1=sTraj_full(k,2);
+    x2=sTraj_full(k+1,1); y2=sTraj_full(k+1,2);
+    Pcontr=RotM(gAng(x1,y1,x2,y2))*contr+repmat([x1;y1],[1,size(contr,2)]);
+    plot(Pcontr(1,:),Pcontr(2,:),'.-','lineWidth',2,'MarkerSize',20),hold on;
+    
+    set(gca,'xlim',[min(sTraj_full(:,1)) max(sTraj_full(:,1))]+marginR,'ylim',[min(sTraj_full(:,2)) max(sTraj_full(:,2))]+marginR);
+    plot(sTraj_full(:,1),sTraj_full(:,2),'.-','lineWidth',2,'MarkerSize',20);
+    plot([x1,x2],[y1,y2],'k.-','lineWidth',2,'MarkerSize',20);
+    axis equal; grid on; xlabel('x'); ylabel('y');
+    title('Object movement in the trajectory');
+    pause(0.2);
+    drawnow;
+    hold off
+end
+
+##### SOURCE END #####
+--></body></html>

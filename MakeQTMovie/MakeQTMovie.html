@@ -1,0 +1,985 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>MakeQTMovie</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-01-17"><meta name="DC.source" content="MakeQTMovie.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Allow images to be added by doing:</a></li><li><a href="#5">This case adapted from addmatrix.  Thanks to</a></li><li><a href="#6">Stephen Eglen <a href="stephen@cogsci.ed.ac.uk">stephen@cogsci.ed.ac.uk</a> for this idea.</a></li><li><a href="#9">Check to see that the image is the correct size.  Do</a></li><li><a href="#10">this by reading in the image and then checking its size.</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> MakeQTMovie(cmd,arg, arg2)
+<span class="comment">% function MakeQTMovie(cmd, arg, arg2)</span>
+<span class="comment">% Create a QuickTime movie from a bunch of figures (and an optional sound).</span>
+<span class="comment">%</span>
+<span class="comment">% Syntax: MakeQTMovie cmd [arg]</span>
+<span class="comment">% The following commands are supported:</span>
+<span class="comment">%	addfigure - Add snapshot of current figure to movie</span>
+<span class="comment">% 	addaxes - Add snapshot of current axes to movie</span>
+<span class="comment">%	addmatrix data - Add a matrix to movie (convert to jpeg with imwrite)</span>
+<span class="comment">%	addmatrixsc data - Add a matrix to movie (convert to jpeg with imwrite)</span>
+<span class="comment">%		(automatically scales image data)</span>
+<span class="comment">%	addsound data [sr] - Add sound to movie (only monaural for now)</span>
+<span class="comment">%		(third argument is the sound's sample rate.)</span>
+<span class="comment">%	cleanup - Remove the temporary files</span>
+<span class="comment">%	demo - Create a demonstration movie</span>
+<span class="comment">% 	finish - Finish movie, write out QT file</span>
+<span class="comment">%	framerate fps - Set movies frame rate [Default is 10 fps]</span>
+<span class="comment">%	quality # - Set JPEG quality (between 0 and 1)</span>
+<span class="comment">% 	size [# #] - Set plot size to [width height]</span>
+<span class="comment">% 	start filename - Start creating a movie with this name</span>
+<span class="comment">% The start command must be called first to provide a movie name.</span>
+<span class="comment">% The finish command must be called last to write out the movie</span>
+<span class="comment">% data. All other commands can be called in any order.  Only one</span>
+<span class="comment">% movie can be created at a time.</span>
+<span class="comment">%</span>
+<span class="comment">% This code is published as Interval Technical Report #1999-066</span>
+<span class="comment">% The latest copy can be found at</span>
+<span class="comment">%	http://web.interval.com/papers/1999-066/</span>
+<span class="comment">% (c) Copyright Malcolm Slaney, Interval Research, March 1999.</span>
+
+<span class="comment">% This is experimental software and is being provided to Licensee</span>
+<span class="comment">% 'AS IS.'  Although the software has been tested on Macintosh, SGI,</span>
+<span class="comment">% Linux, and Windows machines, Interval makes no warranties relating</span>
+<span class="comment">% to the software's performance on these or any other platforms.</span>
+<span class="comment">%</span>
+<span class="comment">% Disclaimer</span>
+<span class="comment">% THIS SOFTWARE IS BEING PROVIDED TO YOU 'AS IS.'  INTERVAL MAKES</span>
+<span class="comment">% NO EXPRESS, IMPLIED OR STATUTORY WARRANTY OF ANY KIND FOR THE</span>
+<span class="comment">% SOFTWARE INCLUDING, BUT NOT LIMITED TO, ANY WARRANTY OF</span>
+<span class="comment">% PERFORMANCE, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.</span>
+<span class="comment">% IN NO EVENT WILL INTERVAL BE LIABLE TO LICENSEE OR ANY THIRD</span>
+<span class="comment">% PARTY FOR ANY DAMAGES, INCLUDING LOST PROFITS OR OTHER INCIDENTAL</span>
+<span class="comment">% OR CONSEQUENTIAL DAMAGES, EVEN IF INTERVAL HAS BEEN ADVISED OF</span>
+<span class="comment">% THE POSSIBLITY THEREOF.</span>
+<span class="comment">%</span>
+<span class="comment">%   This software program is owned by Interval Research</span>
+<span class="comment">% Corporation, but may be used, reproduced, modified and</span>
+<span class="comment">% distributed by Licensee.  Licensee agrees that any copies of the</span>
+<span class="comment">% software program will contain the same proprietary notices and</span>
+<span class="comment">% warranty disclaimers which appear in this software program.</span>
+
+<span class="comment">% This program uses the Matlab imwrite routine to convert each image</span>
+<span class="comment">% frame into JPEG.  After first reserving 8 bytes for a header that points</span>
+<span class="comment">% to the movie description, all the compressed images and the sound are</span>
+<span class="comment">% added to the movie file.  When the 'finish' method is called then the</span>
+<span class="comment">% first 8 bytes of the header are rewritten to indicate the size of the</span>
+<span class="comment">% movie data, and then the movie header ('moov structure') is written</span>
+<span class="comment">% to the output file.</span>
+<span class="comment">%</span>
+<span class="comment">% This routine creates files according to the QuickTime file format as</span>
+<span class="comment">% described in the appendix of</span>
+<span class="comment">%	"Quicktime (Inside MacIntosh)," Apple Computer Incorporated,</span>
+<span class="comment">%	Addison-Wesley Pub Co; ISBN: 0201622017, April 1993.</span>
+<span class="comment">% I appreciate help that I received from Lee Fyock (MathWorks) and Aaron</span>
+<span class="comment">% Hertzmann (Interval) in debugging and testing this work.</span>
+
+<span class="comment">% Changes:</span>
+<span class="comment">% July 5, 1999 - Removed stss atom since it upset PC version of QuickTime</span>
+<span class="comment">% November 11, 1999 - Fixed quality bug in addmatrix.  Added addmatrixsc.</span>
+<span class="comment">% March 7, 2000 - by Jordan Rosenthal (jr@ece.gatech.edu), Added truecolor</span>
+<span class="comment">%    capability when running in Matlab 5.3 changed some help comments, fixed</span>
+<span class="comment">%    some bugs, vectorized some code.</span>
+<span class="comment">% April 7, 2000 - by Malcolm.  Cleaned up axis/figure code and fixed(?) SGI</span>
+<span class="comment">%    playback problems.  Added user data atom to give version information.</span>
+<span class="comment">%    Fixed sound format problems.</span>
+<span class="comment">% April 10, 2000 - by Malcolm. Fixed problem with SGI (at least) and B&amp;W</span>
+<span class="comment">%    addmatrix.</span>
+
+<span class="keyword">if</span> nargin &lt; 1
+	fprintf(<span class="string">'Syntax: MakeQTMovie cmd [arg]\n'</span>)
+	fprintf(<span class="string">'The following commands are supported:\n'</span>);
+	fprintf(<span class="string">'	addfigure - Add snapshot of current figure to movie\n'</span>)
+	fprintf(<span class="string">'	addaxes - Add snapshot of current axes to movie\n'</span>)
+	fprintf(<span class="string">'	addmatrix data - Add a matrix to movie '</span>);
+			fprintf(<span class="string">'(convert to jpeg)\n'</span>)
+	fprintf(<span class="string">'	addmatrixsc data - Add a matrix to movie '</span>);
+			fprintf(<span class="string">'(scale and convert to jpeg)\n'</span>)
+	fprintf(<span class="string">'	addsound data - Add sound samples '</span>);
+			fprintf(<span class="string">'(with optional rate)\n'</span>)
+	fprintf(<span class="string">'	demo - Show this program in action\n'</span>);
+	fprintf(<span class="string">'	finish - Finish movie, write out QT file\n'</span>);
+	fprintf(<span class="string">'	framerate # - Set movie frame rate '</span>);
+			fprintf(<span class="string">'(default is 10fps)\n'</span>);
+	fprintf(<span class="string">'	quality # - Set JPEG quality (between 0 and 1)\n'</span>);
+	fprintf(<span class="string">'	size [# #] - Set plot size to [width height]\n'</span>);
+	fprintf(<span class="string">'	start filename - Start making a movie with '</span>);
+			fprintf(<span class="string">'this name\n'</span>);
+	<span class="keyword">return</span>;
+<span class="keyword">end</span>
+
+<span class="keyword">global</span> MakeQTMovieStatus
+MakeDefaultQTMovieStatus;		<span class="comment">% Needed first time, ignored otherwise</span>
+
+<span class="keyword">switch</span> lower(cmd)
+<span class="keyword">case</span> {<span class="string">'addframe'</span>,<span class="string">'addplot'</span>,<span class="string">'addfigure'</span>,<span class="string">'addaxes'</span>}
+</pre><pre class="codeinput">	<span class="keyword">switch</span> lower(cmd)
+	<span class="keyword">case</span> {<span class="string">'addframe'</span>,<span class="string">'addfigure'</span>}
+		hObj = gcf;		<span class="comment">% Add the entire figure (with all axes)</span>
+	<span class="keyword">otherwise</span>
+		hObj = gca;		<span class="comment">% Add what's inside the current axis</span>
+	<span class="keyword">end</span>
+	frame = getframe(hObj);
+	[I,map] = frame2im(frame);
+	<span class="keyword">if</span> ImageSizeChanged(size(I)) &gt; 0
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	<span class="keyword">if</span> isempty(map)
+					<span class="comment">% RGB image</span>
+		imwrite(I,MakeQTMovieStatus.imageTmp, <span class="string">'jpg'</span>, <span class="string">'Quality'</span>, <span class="keyword">...</span>
+		 MakeQTMovieStatus.spatialQual*100);
+	<span class="keyword">else</span>
+					<span class="comment">% Indexed image</span>
+		writejpg_map(MakeQTMovieStatus.imageTmp, I, map);
+	<span class="keyword">end</span>
+	[pos, len] = AddFileToMovie;
+	n = MakeQTMovieStatus.frameNumber + 1;
+	MakeQTMovieStatus.frameNumber = n;
+	MakeQTMovieStatus.frameStarts(n) = pos;
+	MakeQTMovieStatus.frameLengths(n) = len;
+</pre><h2 id="3">Allow images to be added by doing:</h2><pre class="codeinput"><span class="comment">%%	MakeQTMovie('addimage', '/path/to/file.jpg');</span>
+</pre><h2 id="5">This case adapted from addmatrix.  Thanks to</h2><h2 id="6">Stephen Eglen <a href="stephen@cogsci.ed.ac.uk">stephen@cogsci.ed.ac.uk</a> for this idea.</h2><pre class="codeinput"><span class="keyword">case</span> <span class="string">'addimage'</span>
+</pre><pre class="codeinput">	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a filename with '</span>);
+		fprintf(<span class="string">'the image command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+</pre><h2 id="9">Check to see that the image is the correct size.  Do</h2><h2 id="10">this by reading in the image and then checking its size.</h2><pre class="codeinput"><span class="comment">	%% tim - temporary image.</span>
+        tim = imread(arg); tim_size = size(tim);
+
+	fprintf(<span class="string">'Image %s size %d %d\n'</span>, arg, tim_size(1), tim_size(2));
+ 	<span class="keyword">if</span> ImageSizeChanged(tim_size) &gt; 0
+ 		<span class="keyword">return</span>;
+ 	<span class="keyword">end</span>
+	[pos, len] = AddFileToMovie(arg);
+	n = MakeQTMovieStatus.frameNumber + 1;
+	MakeQTMovieStatus.frameNumber = n;
+	MakeQTMovieStatus.frameStarts(n) = pos;
+	MakeQTMovieStatus.frameLengths(n) = len;
+</pre><pre class="codeinput"><span class="keyword">case</span> <span class="string">'addmatrix'</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a matrix with '</span>);
+		fprintf(<span class="string">'the addmatrix command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	<span class="keyword">if</span> ImageSizeChanged(size(arg)) &gt; 0
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+					<span class="comment">% Work around a bug, at least on the</span>
+					<span class="comment">% SGIs, which causes JPEGs to be</span>
+					<span class="comment">% written which can't be read with the</span>
+					<span class="comment">% SGI QT.  Turn the B&amp;W image into a</span>
+					<span class="comment">% color matrix.</span>
+	<span class="keyword">if</span> ndims(arg) &lt; 3
+		arg(:,:,2) = arg;
+		arg(:,:,3) = arg(:,:,1);
+	<span class="keyword">end</span>
+	imwrite(arg, MakeQTMovieStatus.imageTmp, <span class="string">'jpg'</span>, <span class="string">'Quality'</span>, <span class="keyword">...</span>
+		MakeQTMovieStatus.spatialQual*100);
+	[pos, len] = AddFileToMovie;
+	n = MakeQTMovieStatus.frameNumber + 1;
+	MakeQTMovieStatus.frameNumber = n;
+	MakeQTMovieStatus.frameStarts(n) = pos;
+	MakeQTMovieStatus.frameLengths(n) = len;
+
+<span class="keyword">case</span> <span class="string">'addmatrixsc'</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a matrix with '</span>);
+		fprintf(<span class="string">'the addmatrix command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	<span class="keyword">if</span> ImageSizeChanged(size(arg)) &gt; 0
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	arg = arg - min(min(arg));
+	arg = arg / max(max(arg));
+					<span class="comment">% Work around a bug, at least on the</span>
+					<span class="comment">% SGIs, which causes JPEGs to be</span>
+					<span class="comment">% written which can't be read with the</span>
+					<span class="comment">% SGI QT.  Turn the B&amp;W image into a</span>
+					<span class="comment">% color matrix.</span>
+	<span class="keyword">if</span> ndims(arg) &lt; 3
+		arg(:,:,2) = arg;
+		arg(:,:,3) = arg(:,:,1);
+	<span class="keyword">end</span>
+	imwrite(arg, MakeQTMovieStatus.imageTmp, <span class="string">'jpg'</span>, <span class="string">'Quality'</span>, <span class="keyword">...</span>
+		MakeQTMovieStatus.spatialQual*100);
+	[pos, len] = AddFileToMovie;
+	n = MakeQTMovieStatus.frameNumber + 1;
+	MakeQTMovieStatus.frameNumber = n;
+	MakeQTMovieStatus.frameStarts(n) = pos;
+	MakeQTMovieStatus.frameLengths(n) = len;
+
+<span class="keyword">case</span> <span class="string">'addsound'</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a sound array '</span>);
+		fprintf(<span class="string">'with the addsound command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+					<span class="comment">% Do stereo someday???</span>
+	OpenMovieFile
+	MakeQTMovieStatus.soundLength = length(arg);
+	arg = round(arg/max(max(abs(arg)))*32765);
+	negs = find(arg&lt;0);
+	arg(negs) = arg(negs) + 65536;
+
+	sound = mb16(arg);
+	MakeQTMovieStatus.soundStart = ftell(MakeQTMovieStatus.movieFp);
+	MakeQTMovieStatus.soundLen = length(sound);
+	fwrite(MakeQTMovieStatus.movieFp, sound, <span class="string">'uchar'</span>);
+	<span class="keyword">if</span> nargin &lt; 3
+		arg2 = 22050;
+	<span class="keyword">end</span>
+	MakeQTMovieStatus.soundRate = arg2;
+
+<span class="keyword">case</span> <span class="string">'cleanup'</span>
+	<span class="keyword">if</span> isstruct(MakeQTMovieStatus)
+		<span class="keyword">if</span> ~isempty(MakeQTMovieStatus.movieFp)
+			fclose(MakeQTMovieStatus.movieFp);
+			MakeQTMovieStatus.movieFp = [];
+		<span class="keyword">end</span>
+		<span class="keyword">if</span> ~isempty(MakeQTMovieStatus.imageTmp) &amp; <span class="keyword">...</span>
+		   exist(MakeQTMovieStatus.imageTmp,<span class="string">'file'</span>) &gt; 0
+			delete(MakeQTMovieStatus.imageTmp);
+			MakeQTMovieStatus.imageTmp = [];
+		<span class="keyword">end</span>
+	<span class="keyword">end</span>
+	MakeQTMovieStatus = [];
+
+<span class="keyword">case</span> <span class="string">'debug'</span>
+	fprintf(<span class="string">'Current Movie Data:\n'</span>);
+	fprintf(<span class="string">'    %d frames at %d fps\n'</span>, MakeQTMovieStatus.frameNumber, <span class="keyword">...</span>
+					MakeQTMovieStatus.frameRate);
+	starts = MakeQTMovieStatus.frameStarts;
+	<span class="keyword">if</span> length(starts) &gt; 10, starts = starts(1:10);, <span class="keyword">end</span>;
+	lens = MakeQTMovieStatus.frameLengths;
+	<span class="keyword">if</span> length(lens) &gt; 10, lens = lens(1:10);, <span class="keyword">end</span>;
+	fprintf(<span class="string">'         Start: %6d      Size: %6d\n'</span>, [starts; lens]);
+	fprintf(<span class="string">'    Movie Image Size: %dx%d\n'</span>, <span class="keyword">...</span>
+		MakeQTMovieStatus.imageSize(2), <span class="keyword">...</span><span class="comment">);</span>
+		MakeQTMovieStatus.imageSize(1));
+	<span class="keyword">if</span> length(MakeQTMovieStatus.soundStart) &gt; 0
+		fprintf(<span class="string">'    Sound: %d samples at %d Hz sampling rate '</span>, <span class="keyword">...</span>
+			MakeQTMovieStatus.soundLength, <span class="keyword">...</span>
+			MakeQTMovieStatus.soundRate);
+		fprintf(<span class="string">'at %d.\n'</span>, MakeQTMovieStatus.soundStart);
+	<span class="keyword">else</span>
+		fprintf(<span class="string">'    Sound: No sound track\n'</span>);
+	<span class="keyword">end</span>
+	fprintf(<span class="string">'    Temporary files for images: %s\n'</span>, <span class="keyword">...</span>
+		MakeQTMovieStatus.imageTmp);
+	fprintf(<span class="string">'    Final movie name: %s\n'</span>, MakeQTMovieStatus.movieName);
+	fprintf(<span class="string">'    Compression Quality: %g\n'</span>, <span class="keyword">...</span>
+		MakeQTMovieStatus.spatialQual);
+
+
+<span class="keyword">case</span> <span class="string">'demo'</span>
+	clf
+	fps = 10;
+	movieLength = 10;
+	sr = 22050;
+	fn = <span class="string">'test.mov'</span>;
+	fprintf(<span class="string">'Creating the movie %s.\n'</span>, fn);
+	MakeQTMovie(<span class="string">'start'</span>,fn);
+	MakeQTMovie(<span class="string">'size'</span>, [160 120]);
+	MakeQTMovie(<span class="string">'quality'</span>, 1.0);
+	theSound = [];
+	<span class="keyword">for</span> i=1:movieLength
+		plot(sin((1:100)/4+i));
+		MakeQTMovie(<span class="string">'addaxes'</span>);
+		theSound = [theSound sin(440/sr*2*pi*(2^(i/12))*(1:sr/fps))];
+	<span class="keyword">end</span>
+	MakeQTMovie(<span class="string">'framerate'</span>, fps);
+	MakeQTMovie(<span class="string">'addsound'</span>, theSound, sr);
+	MakeQTMovie(<span class="string">'finish'</span>);
+
+<span class="keyword">case</span> {<span class="string">'finish'</span>,<span class="string">'close'</span>}
+	AddQTHeader;
+	MakeQTMovie(<span class="string">'cleanup'</span>)			<span class="comment">% Remove temporary files</span>
+	<span class="comment">%MakeDefaultQTMovieStatus;</span>
+
+<span class="keyword">case</span> <span class="string">'framerate'</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify the '</span>);
+		fprintf(<span class="string">'frames/second with the framerate command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	MakeQTMovieStatus.frameRate = arg;
+
+<span class="keyword">case</span> <span class="string">'help'</span>
+	MakeQTMovie				<span class="comment">% To get help message.</span>
+
+<span class="keyword">case</span> <span class="string">'size'</span>
+						<span class="comment">% Size is off by one on the</span>
+						<span class="comment">% Mac.</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a vector with '</span>);
+		fprintf(<span class="string">'the size command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	<span class="keyword">if</span> length(arg) ~= 2
+		error(<span class="string">'MakeQTMovie: Error, must supply 2 element size.'</span>);
+	<span class="keyword">end</span>
+	oldUnits = get(gcf,<span class="string">'units'</span>);
+	set(gcf,<span class="string">'units'</span>,<span class="string">'pixels'</span>);
+	cursize = get(gcf, <span class="string">'position'</span>);
+	cursize(3) = arg(1);
+	cursize(4) = arg(2);
+	set(gcf, <span class="string">'position'</span>, cursize);
+	set(gcf,<span class="string">'units'</span>,oldUnits);
+
+<span class="keyword">case</span> <span class="string">'start'</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a file name '</span>);
+		fprintf(<span class="string">'with start command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	MakeQTMovie(<span class="string">'cleanup'</span>);
+	MakeDefaultQTMovieStatus;
+	MakeQTMovieStatus.movieName = arg;
+
+<span class="keyword">case</span> <span class="string">'test'</span>
+	clf
+	MakeQTMovieStatus = [];
+	MakeQTMovie(<span class="string">'start'</span>,<span class="string">'test.mov'</span>);
+ 	MakeQTMovie(<span class="string">'size'</span>, [320 240]);
+	MakeQTMovie(<span class="string">'quality'</span>, 1.0);
+	subplot(2,2,1);
+	<span class="keyword">for</span> i=1:10
+		plot(sin((1:100)/4+i));
+		MakeQTMovie(<span class="string">'addfigure'</span>);
+	<span class="keyword">end</span>
+	MakeQTMovie(<span class="string">'framerate'</span>, 10);
+	MakeQTMovie(<span class="string">'addsound'</span>, sin(1:5000), 22050);
+	MakeQTMovie(<span class="string">'debug'</span>);
+	MakeQTMovie(<span class="string">'finish'</span>);
+
+<span class="keyword">case</span> <span class="string">'quality'</span>
+	<span class="keyword">if</span> nargin &lt; 2
+		fprintf(<span class="string">'MakeQTMovie error: Need to specify a quality '</span>);
+		fprintf(<span class="string">'(between 0-1) with the quality command.\n'</span>);
+		<span class="keyword">return</span>;
+	<span class="keyword">end</span>
+	MakeQTMovieStatus.spatialQual = arg;
+
+<span class="keyword">otherwise</span>
+	fprintf(<span class="string">'MakeQTMovie: Unknown method %s.\n'</span>, cmd);
+<span class="keyword">end</span>
+
+<span class="comment">%%%%%%%%%%%%%%%  MakeDefaultQTMovieStatus %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Make the default movie status structure.</span>
+<span class="keyword">function</span> MakeDefaultQTMovieStatus
+<span class="keyword">global</span> MakeQTMovieStatus
+<span class="keyword">if</span> isempty(MakeQTMovieStatus)
+   MakeQTMovieStatus = struct(<span class="keyword">...</span>
+      <span class="string">'frameRate'</span>, 10, <span class="keyword">...</span><span class="comment">	% frames per second</span>
+      <span class="string">'frameStarts'</span>, [], <span class="keyword">...</span><span class="comment">  % Starting byte position</span>
+      <span class="string">'frameLengths'</span>, [], <span class="keyword">...</span>
+      <span class="string">'timeScale'</span>, 10, <span class="keyword">...</span><span class="comment">	% How much faster does time run?</span>
+      <span class="string">'soundRate'</span>, 22050, <span class="keyword">...</span><span class="comment"> % Sound Sample Rate</span>
+      <span class="string">'soundStart'</span>, [], <span class="keyword">...</span><span class="comment">	% Starting byte position</span>
+      <span class="string">'soundLength'</span>, 0, <span class="keyword">...</span>
+      <span class="string">'soundChannels'</span>, 1, <span class="keyword">...</span><span class="comment">	% Number of channels</span>
+      <span class="string">'frameNumber'</span>, 0, <span class="keyword">...</span>
+      <span class="string">'movieFp'</span>, [], <span class="keyword">...</span><span class="comment">		% File pointer</span>
+      <span class="string">'imageTmp'</span>, tempname, <span class="keyword">...</span>
+      <span class="string">'movieName'</span>, <span class="string">'output.mov'</span>, <span class="keyword">...</span>
+      <span class="string">'imageSize'</span>, [0 0], <span class="keyword">...</span>
+      <span class="string">'trackNumber'</span>, 0, <span class="keyword">...</span>
+      <span class="string">'timeScaleExpansion'</span>, 100, <span class="keyword">...</span>
+      <span class="string">'spatialQual'</span>, 1.0);	<span class="comment">% Between 0.0 and 1.0</span>
+<span class="keyword">end</span>
+
+
+<span class="comment">%%%%%%%%%%%%%%%  ImageSizeChanged %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Check to see if the image size has changed.  This m-file can't</span>
+<span class="comment">% deal with that, so we'll return an error.</span>
+<span class="keyword">function</span> err = ImageSizeChanged(newsize)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+newsize = newsize(1:2);			<span class="comment">% Don't care about RGB info, if present</span>
+oldsize = MakeQTMovieStatus.imageSize;
+err = 0;
+
+<span class="keyword">if</span> sum(oldsize) == 0
+	MakeQTMovieStatus.imageSize = newsize;
+<span class="keyword">else</span>
+	<span class="keyword">if</span> sum(newsize ~= oldsize) &gt; 0
+		fprintf(<span class="string">'MakeQTMovie Error: New image size'</span>);
+		fprintf(<span class="string">'(%dx%d) doesn''t match old size (%dx%d)\n'</span>, <span class="keyword">...</span>
+			newsize(1), newsize(2), oldsize(1), oldsize(2));
+		fprintf(<span class="string">'   Can''t add this image to the movie.\n'</span>);
+		err = 1;
+	<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%%%%%%%%%%%%%%%  AddFileToMovie %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% OK, we've saved out an image file.  Now add it to the end of the movie</span>
+<span class="comment">% file we are creating.</span>
+<span class="comment">% We'll copy the JPEG file in 16kbyte chunks to the end of the movie file.</span>
+<span class="comment">% Keep track of the start and end byte position in the file so we can put</span>
+<span class="comment">% the right information into the QT header.</span>
+<span class="keyword">function</span> [pos, len] = AddFileToMovie(imageTmp)
+<span class="keyword">global</span> MakeQTMovieStatus
+OpenMovieFile
+<span class="keyword">if</span> nargin &lt; 1
+	imageTmp = MakeQTMovieStatus.imageTmp;
+<span class="keyword">end</span>
+fp = fopen(imageTmp, <span class="string">'rb'</span>);
+<span class="keyword">if</span> fp &lt; 0
+	error(<span class="string">'Could not reopen QT image temporary file.'</span>);
+<span class="keyword">end</span>
+
+len = 0;
+pos = ftell(MakeQTMovieStatus.movieFp);
+<span class="keyword">while</span> 1
+	data = fread(fp, 1024*16, <span class="string">'uchar'</span>);
+	<span class="keyword">if</span> isempty(data)
+		<span class="keyword">break</span>;
+	<span class="keyword">end</span>
+	cnt = fwrite(MakeQTMovieStatus.movieFp, data, <span class="string">'uchar'</span>);
+	len = len + cnt;
+<span class="keyword">end</span>
+fclose(fp);
+
+<span class="comment">%%%%%%%%%%%%%%%  AddQTHeader %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Go back and write the atom information that allows</span>
+<span class="comment">% QuickTime to skip the image and sound data and find</span>
+<span class="comment">% its movie description information.</span>
+<span class="keyword">function</span> AddQTHeader()
+<span class="keyword">global</span> MakeQTMovieStatus
+
+pos = ftell(MakeQTMovieStatus.movieFp);
+header = moov_atom;
+cnt = fwrite(MakeQTMovieStatus.movieFp, header, <span class="string">'uchar'</span>);
+fseek(MakeQTMovieStatus.movieFp, 0, -1);
+cnt = fwrite(MakeQTMovieStatus.movieFp, mb32(pos), <span class="string">'uchar'</span>);
+fclose(MakeQTMovieStatus.movieFp);
+MakeQTMovieStatus.movieFp = [];
+
+<span class="comment">%%%%%%%%%%%%%%%  OpenMovieFile %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Open a new movie file.  Write out the initial QT header.  We'll fill in</span>
+<span class="comment">% the correct length later.</span>
+<span class="keyword">function</span> OpenMovieFile
+<span class="keyword">global</span> MakeQTMovieStatus
+<span class="keyword">if</span> isempty(MakeQTMovieStatus.movieFp)
+	fp = fopen(MakeQTMovieStatus.movieName, <span class="string">'wb'</span>);
+	<span class="keyword">if</span> fp &lt; 0
+		error(<span class="string">'Could not open QT movie output file.'</span>);
+	<span class="keyword">end</span>
+	MakeQTMovieStatus.movieFp = fp;
+	cnt = fwrite(fp, [mb32(0) mbstring(<span class="string">'mdat'</span>)], <span class="string">'uchar'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">%%%%%%%%%%%%%%%  writejpg_map %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Like the imwrite routine, but first pass the image data through the indicated</span>
+<span class="comment">% RGB map.</span>
+<span class="keyword">function</span> writejpg_map(name,I,map)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+[y,x] = size(I);
+
+<span class="comment">% Force values to be valid indexes.  This fixes a bug that occasionally</span>
+<span class="comment">% occurs in frame2im in Matlab 5.2 which incorrectly produces values of I</span>
+<span class="comment">% equal to zero.</span>
+I = max(1,min(I,size(map,1)));
+
+rgb = zeros(y, x, 3);
+t = zeros(y,x);
+t(:) = map(I(:),1)*255; rgb(:,:,1) = t;
+t(:) = map(I(:),2)*255; rgb(:,:,2) = t;
+t(:) = map(I(:),3)*255; rgb(:,:,3) = t;
+
+imwrite(uint8(rgb),name,<span class="string">'jpeg'</span>,<span class="string">'Quality'</span>,MakeQTMovieStatus.spatialQual*100);
+
+<span class="comment">%%%%%%%%%%%%%%%  SetAtomSize %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Fill in the size of the atom</span>
+<span class="keyword">function</span> y=SetAtomSize(x)
+y = x;
+y(1:4) = mb32(length(x));
+
+<span class="comment">%%%%%%%%%%%%%%%  mb32 %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Make a vector from a 32 bit integer</span>
+<span class="keyword">function</span> y = mb32(x)
+<span class="keyword">if</span> size(x,1) &gt; size(x,2)
+	x = x';
+<span class="keyword">end</span>
+
+y = [bitand(bitshift(x,-24),255); <span class="keyword">...</span>
+     bitand(bitshift(x,-16),255); <span class="keyword">...</span>
+     bitand(bitshift(x, -8),255); <span class="keyword">...</span>
+     bitand(x,              255)];
+y = y(:)';
+
+<span class="comment">%%%%%%%%%%%%%%%  mb16 %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Make a vector from a 16 bit integer</span>
+<span class="keyword">function</span> y = mb16(x)
+<span class="keyword">if</span> size(x,1) &gt; size(x,2)
+	x = x';
+<span class="keyword">end</span>
+
+y = [bitand(bitshift(x, -8),255); <span class="keyword">...</span>
+     bitand(x,              255)];
+y = y(:)';
+
+<span class="comment">%%%%%%%%%%%%%%%  mb8 %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Make a vector from a 8 bit integer</span>
+<span class="keyword">function</span> y = mb8(x)
+<span class="keyword">if</span> size(x,1) &gt; size(x,2)
+	x = x';
+<span class="keyword">end</span>
+
+y = [bitand(x,              255)];
+y = y(:)';
+
+<span class="comment">%</span>
+<span class="comment">% The following routines all create atoms necessary</span>
+<span class="comment">% to describe a QuickTime Movie. The basic idea is to</span>
+<span class="comment">% fill in the necessary data, all converted to 8 bit</span>
+<span class="comment">% characters, then fix it up later with SetAtomSize so</span>
+<span class="comment">% that it has the correct header.  (This is easier than</span>
+<span class="comment">% counting by hand.)</span>
+
+<span class="comment">%%%%%%%%%%%%%%%  mbstring %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Make a vector from a character string</span>
+<span class="keyword">function</span> y = mbstring(s)
+y = double(s);
+
+
+<span class="comment">%%%%%%%%%%%%%%%  dinf_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = dinf_atom()
+y = SetAtomSize([mb32(0) mbstring(<span class="string">'dinf'</span>) dref_atom]);
+
+<span class="comment">%%%%%%%%%%%%%%%  dref_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = dref_atom()
+y = SetAtomSize([mb32(0) mbstring(<span class="string">'dref'</span>) mb32(0) mb32(1) <span class="keyword">...</span>
+		mb32(12) mbstring(<span class="string">'alis'</span>) mb32(1)]);
+
+<span class="comment">%%%%%%%%%%%%%%%  edts_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = edts_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+fixed1 = bitshift(1,16);			<span class="comment">% Fixed point 1</span>
+<span class="keyword">if</span> add_sound_p &gt; 0
+	duration = MakeQTMovieStatus.soundLength / <span class="keyword">...</span>
+			MakeQTMovieStatus.soundRate * <span class="keyword">...</span>
+			MakeQTMovieStatus.timeScale;
+<span class="keyword">else</span>
+	duration = MakeQTMovieStatus.frameNumber / <span class="keyword">...</span>
+			MakeQTMovieStatus.frameRate * <span class="keyword">...</span>
+			MakeQTMovieStatus.timeScale;
+<span class="keyword">end</span>
+duration = ceil(duration);
+
+y = [mb32(0) <span class="keyword">...</span><span class="comment">				% Atom Size</span>
+     mbstring(<span class="string">'edts'</span>) <span class="keyword">...</span><span class="comment">			% Atom Name</span>
+     SetAtomSize([mb32(0) <span class="keyword">...</span><span class="comment">			% Atom Size</span>
+		  mbstring(<span class="string">'elst'</span>) <span class="keyword">...</span><span class="comment">		% Atom Name</span>
+		  mb32(0) <span class="keyword">...</span><span class="comment">			% Version/Flags</span>
+		  mb32(1) <span class="keyword">...</span><span class="comment">			% Number of entries</span>
+		  mb32(duration) <span class="keyword">...</span><span class="comment">		% Length of this track</span>
+		  mb32(0) <span class="keyword">...</span><span class="comment">			% Time</span>
+		  mb32(fixed1)])];		<span class="comment">% Rate</span>
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  hdlr_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = hdlr_atom(component_type, sub_type)
+<span class="keyword">if</span> strcmp(sub_type, <span class="string">'vide'</span>)
+	type_string = <span class="string">'Apple Video Media Handler'</span>;
+<span class="keyword">elseif</span> strcmp(sub_type, <span class="string">'alis'</span>)
+	type_string = <span class="string">'Apple Alias Data Handler'</span>;
+<span class="keyword">elseif</span> strcmp(sub_type, <span class="string">'soun'</span>)
+	type_string = <span class="string">'Apple Sound Media Handler'</span>;
+<span class="keyword">end</span>
+
+y = [mb32(0) <span class="keyword">...</span><span class="comment">				% Atom Size</span>
+     mbstring(<span class="string">'hdlr'</span>) <span class="keyword">...</span><span class="comment">			% Atom Name</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">				% Version and Flags</span>
+     mbstring(component_type) <span class="keyword">...</span><span class="comment">		% Component Name</span>
+     mbstring(sub_type) <span class="keyword">...</span><span class="comment">			% Sub Type Name</span>
+     mbstring(<span class="string">'appl'</span>) <span class="keyword">...</span><span class="comment">			% Component manufacturer</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">				% Component flags</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">				% Component flag mask</span>
+     mb8(length(type_string)) <span class="keyword">...</span><span class="comment">		% Type Name byte count</span>
+     mbstring(type_string)];			<span class="comment">% Type Name</span>
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  mdhd_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = mdhd_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+<span class="keyword">if</span> add_sound_p
+	data = [mb32(MakeQTMovieStatus.soundRate)  <span class="keyword">...</span>
+		mb32(MakeQTMovieStatus.soundLength)];
+<span class="keyword">else</span>
+	data = [mb32(MakeQTMovieStatus.frameRate * <span class="keyword">...</span>
+			MakeQTMovieStatus.timeScaleExpansion)  <span class="keyword">...</span>
+		mb32(MakeQTMovieStatus.frameNumber * <span class="keyword">...</span>
+			MakeQTMovieStatus.timeScaleExpansion)];
+<span class="keyword">end</span>
+
+y = [mb32(0) mbstring(<span class="string">'mdhd'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+     mb32(0) <span class="keyword">...</span>
+     mb32(round(now*3600*24)) <span class="keyword">...</span><span class="comment">		% Creation time</span>
+     mb32(round(now*3600*24)) <span class="keyword">...</span><span class="comment">		% Modification time</span>
+     data <span class="keyword">...</span>
+     mb16(0) mb16(0)];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  mdia_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = mdia_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+<span class="keyword">if</span> add_sound_p
+	hdlr = hdlr_atom(<span class="string">'mhlr'</span>, <span class="string">'soun'</span>);
+<span class="keyword">else</span>
+	hdlr = hdlr_atom(<span class="string">'mhlr'</span>, <span class="string">'vide'</span>);
+<span class="keyword">end</span>
+
+y = [mb32(0) mbstring(<span class="string">'mdia'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+     mdhd_atom(add_sound_p) <span class="keyword">...</span>
+     hdlr <span class="keyword">...</span><span class="comment">					% Handler Atom</span>
+     minf_atom(add_sound_p)];
+y = SetAtomSize(y);
+
+
+<span class="comment">%%%%%%%%%%%%%%%  minf_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = minf_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+<span class="keyword">if</span> add_sound_p
+	data = smhd_atom;
+<span class="keyword">else</span>
+	data = vmhd_atom;
+<span class="keyword">end</span>
+
+y = [mb32(0) mbstring(<span class="string">'minf'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+     data <span class="keyword">...</span>
+     hdlr_atom(<span class="string">'dhlr'</span>,<span class="string">'alis'</span>) <span class="keyword">...</span>
+     dinf_atom <span class="keyword">...</span>
+     stbl_atom(add_sound_p)];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  moov_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y=moov_atom
+<span class="keyword">global</span> MakeQTMovieStatus
+MakeQTMovieStatus.timeScale = MakeQTMovieStatus.frameRate * <span class="keyword">...</span>
+				MakeQTMovieStatus.timeScaleExpansion;
+
+<span class="keyword">if</span> MakeQTMovieStatus.soundLength &gt; 0
+	sound = trak_atom(1);
+<span class="keyword">else</span>
+	sound = [];
+<span class="keyword">end</span>
+
+y = [mb32(0) mbstring(<span class="string">'moov'</span>) <span class="keyword">...</span>
+     mvhd_atom udat_atom sound trak_atom(0) ];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  mvhd_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y=mvhd_atom
+<span class="keyword">global</span> MakeQTMovieStatus
+
+fixed1 = bitshift(1,16);			<span class="comment">% Fixed point 1</span>
+frac1 = bitshift(1,30);				<span class="comment">% Fractional 1</span>
+<span class="keyword">if</span> length(MakeQTMovieStatus.soundStart) &gt; 0
+	NumberOfTracks = 2;
+<span class="keyword">else</span>
+	NumberOfTracks = 1;
+<span class="keyword">end</span>
+
+					<span class="comment">% Need to make sure its longer</span>
+					<span class="comment">% of movie and sound lengths</span>
+MovieDuration = max(MakeQTMovieStatus.frameNumber / <span class="keyword">...</span>
+			MakeQTMovieStatus.frameRate, <span class="keyword">...</span>
+		    MakeQTMovieStatus.soundLength / <span class="keyword">...</span>
+			MakeQTMovieStatus.soundRate);
+MovieDuration = ceil(MovieDuration * MakeQTMovieStatus.timeScale);
+
+y = [mb32(0) <span class="keyword">...</span><span class="comment">			% Size</span>
+     mbstring(<span class="string">'mvhd'</span>) <span class="keyword">...</span><span class="comment">		% Movie Data</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Version and Flags</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Creation Time (unknown)</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Modification Time (unknown)</span>
+     mb32(MakeQTMovieStatus.timeScale) <span class="keyword">...</span><span class="comment">	% Movie's Time Scale</span>
+     mb32(MovieDuration) <span class="keyword">...</span><span class="comment">		% Movie Duration</span>
+     mb32(fixed1) <span class="keyword">...</span><span class="comment">			% Preferred Rate</span>
+     mb16(255) <span class="keyword">...</span><span class="comment">			% Preferred Volume</span>
+     mb16(0) <span class="keyword">...</span><span class="comment">			% Fill</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Fill</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Fill</span>
+     mb32(fixed1) mb32(0) mb32(0) <span class="keyword">...</span><span class="comment">	% Transformation matrix (identity)</span>
+     mb32(0) mb32(fixed1) mb32(0) <span class="keyword">...</span>
+     mb32(0) mb32(0) mb32(frac1) <span class="keyword">...</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Preview Time</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Preview Duration</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Poster Time</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Selection Time</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Selection Duration</span>
+     mb32(0) <span class="keyword">...</span><span class="comment">			% Current Time</span>
+     mb32(NumberOfTracks)];		<span class="comment">% Video and/or Sound?</span>
+
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  raw_image_description %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = raw_image_description()
+<span class="keyword">global</span> MakeQTMovieStatus
+
+fixed1 = bitshift(1,16);			<span class="comment">% Fixed point 1</span>
+codec = [12 <span class="string">'Photo - JPEG                   '</span>];
+
+y = [mb32(0) mbstring(<span class="string">'jpeg'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+     mb32(0) mb16(0) mb16(0) mb16(0) mb16(1) <span class="keyword">...</span>
+     mbstring(<span class="string">'appl'</span>) <span class="keyword">...</span>
+     mb32(1023) <span class="keyword">...</span><span class="comment">				% Temporal Quality (perfect)</span>
+     mb32(floor(1023*MakeQTMovieStatus.spatialQual)) <span class="keyword">...</span>
+     mb16(MakeQTMovieStatus.imageSize(2)) <span class="keyword">...</span>
+     mb16(MakeQTMovieStatus.imageSize(1)) <span class="keyword">...</span>
+     mb32(fixed1 * 72) mb32(fixed1 * 72) <span class="keyword">...</span>
+     mb32(0) <span class="keyword">...</span>
+     mb16(0) <span class="keyword">...</span>
+     mbstring(codec) <span class="keyword">...</span>
+     mb16(24) mb16(65535)];
+y = SetAtomSize(y);
+
+
+<span class="comment">%%%%%%%%%%%%%%%  raw_sound_description %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = raw_sound_description()
+<span class="keyword">global</span> MakeQTMovieStatus
+y = [mb32(0) mbstring(<span class="string">'twos'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+     mb32(0) mb16(0) mb16(0) mb16(0) mb16(0) <span class="keyword">...</span>
+     mb32(0) <span class="keyword">...</span>
+     mb16(MakeQTMovieStatus.soundChannels) <span class="keyword">...</span>
+     mb16(16) <span class="keyword">...</span><span class="comment">				% 16 bits per sample</span>
+     mb16(0) mb16(0) <span class="keyword">...</span>
+     mb32(round(MakeQTMovieStatus.soundRate*65536))];
+y = SetAtomSize(y);
+
+
+<span class="comment">%%%%%%%%%%%%%%%  smhd_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = smhd_atom()
+y = SetAtomSize([mb32(0) mbstring(<span class="string">'smhd'</span>) mb32(0) mb16(0) mb16(0)]);
+
+<span class="comment">%%%%%%%%%%%%%%%  stbl_atom %%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Removed the stss atom since it seems to upset the PC version of QT</span>
+<span class="comment">% and it is empty so it doesn't add anything.</span>
+<span class="comment">% Malcolm - July 5, 1999</span>
+<span class="keyword">function</span> y = stbl_atom(add_sound_p)
+y = [mb32(0) mbstring(<span class="string">'stbl'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+     stsd_atom(add_sound_p) <span class="keyword">...</span>
+     stts_atom(add_sound_p) <span class="keyword">...</span>
+     stsc_atom(add_sound_p) <span class="keyword">...</span>
+     stsz_atom(add_sound_p) <span class="keyword">...</span>
+     stco_atom(add_sound_p)];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  stco_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = stco_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+<span class="keyword">if</span> add_sound_p
+	y = [mb32(0) mbstring(<span class="string">'stco'</span>) mb32(0) mb32(1) <span class="keyword">...</span>
+	     mb32(MakeQTMovieStatus.soundStart)];
+<span class="keyword">else</span>
+	y = [mb32(0) mbstring(<span class="string">'stco'</span>) mb32(0) <span class="keyword">...</span>
+	     mb32(MakeQTMovieStatus.frameNumber) <span class="keyword">...</span>
+	     mb32(MakeQTMovieStatus.frameStarts)];
+<span class="keyword">end</span>
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  stsc_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = stsc_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+<span class="keyword">if</span> add_sound_p
+	samplesperchunk = MakeQTMovieStatus.soundLength;
+<span class="keyword">else</span>
+	samplesperchunk = 1;
+<span class="keyword">end</span>
+
+y = [mb32(0) mbstring(<span class="string">'stsc'</span>) mb32(0) mb32(1)  <span class="keyword">...</span>
+     mb32(1) mb32(samplesperchunk) mb32(1)];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  stsd_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = stsd_atom(add_sound_p)
+<span class="keyword">if</span> add_sound_p
+	desc = raw_sound_description;
+<span class="keyword">else</span>
+	desc = raw_image_description;
+<span class="keyword">end</span>
+
+y = [mb32(0) mbstring(<span class="string">'stsd'</span>) mb32(0) mb32(1) desc];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  stss_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = stss_atom()
+y = SetAtomSize([mb32(0) mbstring(<span class="string">'stss'</span>) mb32(0) mb32(0)]);
+
+<span class="comment">%%%%%%%%%%%%%%%  stsz_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = stsz_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+<span class="keyword">if</span> add_sound_p
+	y = [mb32(0) mbstring(<span class="string">'stsz'</span>) mb32(0) mb32(2) <span class="keyword">...</span>
+	     mb32(MakeQTMovieStatus.soundLength)];
+<span class="keyword">else</span>
+	y = [mb32(0) mbstring(<span class="string">'stsz'</span>) mb32(0) mb32(0) <span class="keyword">...</span>
+	     mb32(MakeQTMovieStatus.frameNumber) <span class="keyword">...</span>
+	     mb32(MakeQTMovieStatus.frameLengths)];
+<span class="keyword">end</span>
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  stts_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = stts_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+<span class="keyword">if</span> add_sound_p
+	count_duration = [mb32(MakeQTMovieStatus.soundLength) mb32(1)];
+<span class="keyword">else</span>
+	count_duration = [mb32(MakeQTMovieStatus.frameNumber) <span class="keyword">...</span>
+		mb32(MakeQTMovieStatus.timeScaleExpansion)];
+<span class="keyword">end</span>
+
+y = SetAtomSize([mb32(0) mbstring(<span class="string">'stts'</span>) mb32(0) mb32(1) count_duration]);
+
+<span class="comment">%%%%%%%%%%%%%%%  trak_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = trak_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+y = [mb32(0) mbstring(<span class="string">'trak'</span>) <span class="keyword">...</span><span class="comment">		% Atom Header</span>
+	tkhd_atom(add_sound_p) <span class="keyword">...</span><span class="comment">		% Track header</span>
+	edts_atom(add_sound_p) <span class="keyword">...</span><span class="comment">		% Edit List</span>
+	mdia_atom(add_sound_p)];
+y = SetAtomSize(y);
+
+<span class="comment">%%%%%%%%%%%%%%%  tkhd_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = tkhd_atom(add_sound_p)
+<span class="keyword">global</span> MakeQTMovieStatus
+
+fixed1 = bitshift(1,16);			<span class="comment">% Fixed point 1</span>
+frac1 = bitshift(1,30);				<span class="comment">% Fractional 1 (CHECK THIS)</span>
+
+<span class="keyword">if</span> add_sound_p &gt; 0
+	duration = MakeQTMovieStatus.soundLength / <span class="keyword">...</span>
+			MakeQTMovieStatus.soundRate * <span class="keyword">...</span>
+			MakeQTMovieStatus.timeScale;
+<span class="keyword">else</span>
+	duration = MakeQTMovieStatus.frameNumber / <span class="keyword">...</span>
+			MakeQTMovieStatus.frameRate * <span class="keyword">...</span>
+			MakeQTMovieStatus.timeScale;
+<span class="keyword">end</span>
+duration = ceil(duration);
+
+y = [mb32(0) mbstring(<span class="string">'tkhd'</span>) <span class="keyword">...</span><span class="comment">	% Atom Header</span>
+     mb32(15) <span class="keyword">...</span><span class="comment">			% Version and flags</span>
+     mb32(round(now*3600*24)) <span class="keyword">...</span><span class="comment">	% Creation time</span>
+     mb32(round(now*3600*24)) <span class="keyword">...</span><span class="comment">	% Modification time</span>
+     mb32(MakeQTMovieStatus.trackNumber) <span class="keyword">...</span>
+     mb32(0) <span class="keyword">...</span>
+     mb32(duration) <span class="keyword">...</span><span class="comment">			% Track duration</span>
+     mb32(0) mb32(0) <span class="keyword">...</span><span class="comment">		% Offset and priority</span>
+     mb16(0) mb16(0) mb16(255) mb16(0) <span class="keyword">...</span><span class="comment">	% Layer, Group, Volume, fill</span>
+     mb32(fixed1) mb32(0) mb32(0) <span class="keyword">...</span><span class="comment">	% Transformation matrix (identity)</span>
+     mb32(0) mb32(fixed1) mb32(0) <span class="keyword">...</span>
+     mb32(0) mb32(0) mb32(frac1)];
+
+<span class="keyword">if</span> add_sound_p
+	y = [y mb32(0) mb32(0)];	<span class="comment">% Zeros for sound</span>
+<span class="keyword">else</span>
+	y = [y mb32(fliplr(MakeQTMovieStatus.imageSize)*fixed1)];
+<span class="keyword">end</span>
+y= SetAtomSize(y);
+
+MakeQTMovieStatus.trackNumber = MakeQTMovieStatus.trackNumber + 1;
+
+<span class="comment">%%%%%%%%%%%%%%%  udat_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = udat_atom()
+atfmt = [64 double(<span class="string">'fmt'</span>)];
+atday = [64 double(<span class="string">'day'</span>)];
+
+VersionString = <span class="string">'Matlab MakeQTMovie version April 7, 2000'</span>;
+
+y = [mb32(0) mbstring(<span class="string">'udta'</span>) <span class="keyword">...</span>
+	SetAtomSize([mb32(0) atfmt mbstring([<span class="string">'Created '</span> VersionString])]) <span class="keyword">...</span>
+	SetAtomSize([mb32(0) atday <span class="string">'  '</span> date])];
+y = SetAtomSize(y);
+
+
+<span class="comment">%%%%%%%%%%%%%%%  vmhd_atom %%%%%%%%%%%%%%%%%</span>
+<span class="keyword">function</span> y = vmhd_atom()
+
+y = SetAtomSize([mb32(0) mbstring(<span class="string">'vmhd'</span>) mb32(0) <span class="keyword">...</span>
+    mb16(64) <span class="keyword">...</span><span class="comment">			% Graphics Mode</span>
+    mb16(0) mb16(0) mb16(0)]);		<span class="comment">% Op Color</span>
+</pre><pre class="codeoutput">Syntax: MakeQTMovie cmd [arg]
+The following commands are supported:
+	addfigure - Add snapshot of current figure to movie
+	addaxes - Add snapshot of current axes to movie
+	addmatrix data - Add a matrix to movie (convert to jpeg)
+	addmatrixsc data - Add a matrix to movie (scale and convert to jpeg)
+	addsound data - Add sound samples (with optional rate)
+	demo - Show this program in action
+	finish - Finish movie, write out QT file
+	framerate # - Set movie frame rate (default is 10fps)
+	quality # - Set JPEG quality (between 0 and 1)
+	size [# #] - Set plot size to [width height]
+	start filename - Start making a movie with this name
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function MakeQTMovie(cmd,arg, arg2)% function MakeQTMovie(cmd, arg, arg2)  % Create a QuickTime movie from a bunch of figures (and an optional sound).%% Syntax: MakeQTMovie cmd [arg]% The following commands are supported:%	addfigure - Add snapshot of current figure to movie% 	addaxes - Add snapshot of current axes to movie%	addmatrix data - Add a matrix to movie (convert to jpeg with imwrite)%	addmatrixsc data - Add a matrix to movie (convert to jpeg with imwrite)%		(automatically scales image data)%	addsound data [sr] - Add sound to movie (only monaural for now)%		(third argument is the sound's sample rate.)%	cleanup - Remove the temporary files%	demo - Create a demonstration movie% 	finish - Finish movie, write out QT file%	framerate fps - Set movies frame rate [Default is 10 fps]%	quality # - Set JPEG quality (between 0 and 1)% 	size [# #] - Set plot size to [width height]% 	start filename - Start creating a movie with this name% The start command must be called first to provide a movie name.% The finish command must be called last to write out the movie% data. All other commands can be called in any order.  Only one% movie can be created at a time.%% This code is published as Interval Technical Report #1999-066% The latest copy can be found at %	http://web.interval.com/papers/1999-066/% (c) Copyright Malcolm Slaney, Interval Research, March 1999.% This is experimental software and is being provided to Licensee% 'AS IS.'  Although the software has been tested on Macintosh, SGI, % Linux, and Windows machines, Interval makes no warranties relating% to the software's performance on these or any other platforms.%% Disclaimer% THIS SOFTWARE IS BEING PROVIDED TO YOU 'AS IS.'  INTERVAL MAKES% NO EXPRESS, IMPLIED OR STATUTORY WARRANTY OF ANY KIND FOR THE% SOFTWARE INCLUDING, BUT NOT LIMITED TO, ANY WARRANTY OF% PERFORMANCE, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.% IN NO EVENT WILL INTERVAL BE LIABLE TO LICENSEE OR ANY THIRD% PARTY FOR ANY DAMAGES, INCLUDING LOST PROFITS OR OTHER INCIDENTAL% OR CONSEQUENTIAL DAMAGES, EVEN IF INTERVAL HAS BEEN ADVISED OF% THE POSSIBLITY THEREOF.%%   This software program is owned by Interval Research% Corporation, but may be used, reproduced, modified and% distributed by Licensee.  Licensee agrees that any copies of the% software program will contain the same proprietary notices and% warranty disclaimers which appear in this software program.% This program uses the Matlab imwrite routine to convert each image% frame into JPEG.  After first reserving 8 bytes for a header that points% to the movie description, all the compressed images and the sound are % added to the movie file.  When the 'finish' method is called then the% first 8 bytes of the header are rewritten to indicate the size of the % movie data, and then the movie header ('moov structure') is written % to the output file.%% This routine creates files according to the QuickTime file format as% described in the appendix of %	"Quicktime (Inside MacIntosh)," Apple Computer Incorporated, %	Addison-Wesley Pub Co; ISBN: 0201622017, April 1993.% I appreciate help that I received from Lee Fyock (MathWorks) and Aaron % Hertzmann (Interval) in debugging and testing this work.% Changes:% July 5, 1999 - Removed stss atom since it upset PC version of QuickTime% November 11, 1999 - Fixed quality bug in addmatrix.  Added addmatrixsc.% March 7, 2000 - by Jordan Rosenthal (jr@ece.gatech.edu), Added truecolor %    capability when running in Matlab 5.3 changed some help comments, fixed %    some bugs, vectorized some code.% April 7, 2000 - by Malcolm.  Cleaned up axis/figure code and fixed(?) SGI%    playback problems.  Added user data atom to give version information.%    Fixed sound format problems.% April 10, 2000 - by Malcolm. Fixed problem with SGI (at least) and B&W%    addmatrix.if nargin < 1	fprintf('Syntax: MakeQTMovie cmd [arg]\n')	fprintf('The following commands are supported:\n');	fprintf('	addfigure - Add snapshot of current figure to movie\n')	fprintf('	addaxes - Add snapshot of current axes to movie\n')	fprintf('	addmatrix data - Add a matrix to movie ');			fprintf('(convert to jpeg)\n')	fprintf('	addmatrixsc data - Add a matrix to movie ');			fprintf('(scale and convert to jpeg)\n')	fprintf('	addsound data - Add sound samples ');			fprintf('(with optional rate)\n')	fprintf('	demo - Show this program in action\n');	fprintf('	finish - Finish movie, write out QT file\n');	fprintf('	framerate # - Set movie frame rate ');			fprintf('(default is 10fps)\n');	fprintf('	quality # - Set JPEG quality (between 0 and 1)\n');	fprintf('	size [# #] - Set plot size to [width height]\n');	fprintf('	start filename - Start making a movie with ');			fprintf('this name\n');	return;endglobal MakeQTMovieStatusMakeDefaultQTMovieStatus;		% Needed first time, ignored otherwiseswitch lower(cmd)case {'addframe','addplot','addfigure','addaxes'}	switch lower(cmd)	case {'addframe','addfigure'}		hObj = gcf;		% Add the entire figure (with all axes)	otherwise		hObj = gca;		% Add what's inside the current axis	end	frame = getframe(hObj);	[I,map] = frame2im(frame);	if ImageSizeChanged(size(I)) > 0		return;	end	if isempty(map)					% RGB image		imwrite(I,MakeQTMovieStatus.imageTmp, 'jpg', 'Quality', ...		 MakeQTMovieStatus.spatialQual*100);	else					% Indexed image		writejpg_map(MakeQTMovieStatus.imageTmp, I, map);	end	[pos, len] = AddFileToMovie;	n = MakeQTMovieStatus.frameNumber + 1;	MakeQTMovieStatus.frameNumber = n;	MakeQTMovieStatus.frameStarts(n) = pos;	MakeQTMovieStatus.frameLengths(n) = len;   %% Allow images to be added by doing:%%	MakeQTMovie('addimage', '/path/to/file.jpg');%% This case adapted from addmatrix.  Thanks to %% Stephen Eglen <stephen@cogsci.ed.ac.uk> for this idea.case 'addimage'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a filename with ');		fprintf('the image command.\n');		return;	end        %% Check to see that the image is the correct size.  Do        %% this by reading in the image and then checking its size.	%% tim - temporary image.        tim = imread(arg); tim_size = size(tim);		fprintf('Image %s size %d %d\n', arg, tim_size(1), tim_size(2)); 	if ImageSizeChanged(tim_size) > 0 		return; 	end	[pos, len] = AddFileToMovie(arg);	n = MakeQTMovieStatus.frameNumber + 1;	MakeQTMovieStatus.frameNumber = n;	MakeQTMovieStatus.frameStarts(n) = pos;	MakeQTMovieStatus.frameLengths(n) = len;case 'addmatrix'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a matrix with ');		fprintf('the addmatrix command.\n');		return;	end	if ImageSizeChanged(size(arg)) > 0		return;	end					% Work around a bug, at least on the					% SGIs, which causes JPEGs to be 					% written which can't be read with the					% SGI QT.  Turn the B&W image into a					% color matrix.	if ndims(arg) < 3		arg(:,:,2) = arg;		arg(:,:,3) = arg(:,:,1);	end	imwrite(arg, MakeQTMovieStatus.imageTmp, 'jpg', 'Quality', ...		MakeQTMovieStatus.spatialQual*100);	[pos, len] = AddFileToMovie;	n = MakeQTMovieStatus.frameNumber + 1;	MakeQTMovieStatus.frameNumber = n;	MakeQTMovieStatus.frameStarts(n) = pos;	MakeQTMovieStatus.frameLengths(n) = len;	case 'addmatrixsc'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a matrix with ');		fprintf('the addmatrix command.\n');		return;	end	if ImageSizeChanged(size(arg)) > 0		return;	end	arg = arg - min(min(arg));	arg = arg / max(max(arg));					% Work around a bug, at least on the					% SGIs, which causes JPEGs to be 					% written which can't be read with the					% SGI QT.  Turn the B&W image into a					% color matrix.	if ndims(arg) < 3		arg(:,:,2) = arg;		arg(:,:,3) = arg(:,:,1);	end	imwrite(arg, MakeQTMovieStatus.imageTmp, 'jpg', 'Quality', ...		MakeQTMovieStatus.spatialQual*100);	[pos, len] = AddFileToMovie;	n = MakeQTMovieStatus.frameNumber + 1;	MakeQTMovieStatus.frameNumber = n;	MakeQTMovieStatus.frameStarts(n) = pos;	MakeQTMovieStatus.frameLengths(n) = len;case 'addsound'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a sound array ');		fprintf('with the addsound command.\n');		return;	end					% Do stereo someday???	OpenMovieFile	MakeQTMovieStatus.soundLength = length(arg);	arg = round(arg/max(max(abs(arg)))*32765);	negs = find(arg<0);	arg(negs) = arg(negs) + 65536;	sound = mb16(arg);	MakeQTMovieStatus.soundStart = ftell(MakeQTMovieStatus.movieFp);	MakeQTMovieStatus.soundLen = length(sound);	fwrite(MakeQTMovieStatus.movieFp, sound, 'uchar');	if nargin < 3		arg2 = 22050;	end	MakeQTMovieStatus.soundRate = arg2;	case 'cleanup'	if isstruct(MakeQTMovieStatus)		if ~isempty(MakeQTMovieStatus.movieFp)			fclose(MakeQTMovieStatus.movieFp);			MakeQTMovieStatus.movieFp = [];		end		if ~isempty(MakeQTMovieStatus.imageTmp) & ...		   exist(MakeQTMovieStatus.imageTmp,'file') > 0			delete(MakeQTMovieStatus.imageTmp);			MakeQTMovieStatus.imageTmp = [];		end	end	MakeQTMovieStatus = [];case 'debug'	fprintf('Current Movie Data:\n');	fprintf('    %d frames at %d fps\n', MakeQTMovieStatus.frameNumber, ...					MakeQTMovieStatus.frameRate);	starts = MakeQTMovieStatus.frameStarts;	if length(starts) > 10, starts = starts(1:10);, end;	lens = MakeQTMovieStatus.frameLengths;	if length(lens) > 10, lens = lens(1:10);, end;	fprintf('         Start: %6d      Size: %6d\n', [starts; lens]);	fprintf('    Movie Image Size: %dx%d\n', ...		MakeQTMovieStatus.imageSize(2), ...);		MakeQTMovieStatus.imageSize(1));	if length(MakeQTMovieStatus.soundStart) > 0  		fprintf('    Sound: %d samples at %d Hz sampling rate ', ...			MakeQTMovieStatus.soundLength, ...			MakeQTMovieStatus.soundRate);		fprintf('at %d.\n', MakeQTMovieStatus.soundStart);	else		fprintf('    Sound: No sound track\n');	end	fprintf('    Temporary files for images: %s\n', ...		MakeQTMovieStatus.imageTmp);	fprintf('    Final movie name: %s\n', MakeQTMovieStatus.movieName);	fprintf('    Compression Quality: %g\n', ...		MakeQTMovieStatus.spatialQual);case 'demo'	clf	fps = 10;	movieLength = 10;	sr = 22050;	fn = 'test.mov';	fprintf('Creating the movie %s.\n', fn);	MakeQTMovie('start',fn);	MakeQTMovie('size', [160 120]);	MakeQTMovie('quality', 1.0);	theSound = [];	for i=1:movieLength		plot(sin((1:100)/4+i));		MakeQTMovie('addaxes');		theSound = [theSound sin(440/sr*2*pi*(2^(i/12))*(1:sr/fps))];	end	MakeQTMovie('framerate', fps);	MakeQTMovie('addsound', theSound, sr);	MakeQTMovie('finish');case {'finish','close'}	AddQTHeader;	MakeQTMovie('cleanup')			% Remove temporary files	%MakeDefaultQTMovieStatus;case 'framerate'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify the ');		fprintf('frames/second with the framerate command.\n');		return;	end	MakeQTMovieStatus.frameRate = arg;case 'help'	MakeQTMovie				% To get help message.case 'size'						% Size is off by one on the						% Mac.	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a vector with ');		fprintf('the size command.\n');		return;	end	if length(arg) ~= 2		error('MakeQTMovie: Error, must supply 2 element size.');	end	oldUnits = get(gcf,'units');	set(gcf,'units','pixels');	cursize = get(gcf, 'position');	cursize(3) = arg(1);	cursize(4) = arg(2);	set(gcf, 'position', cursize);	set(gcf,'units',oldUnits);case 'start'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a file name ');		fprintf('with start command.\n');		return;	end	MakeQTMovie('cleanup');	MakeDefaultQTMovieStatus;	MakeQTMovieStatus.movieName = arg;	case 'test'	clf	MakeQTMovieStatus = [];	MakeQTMovie('start','test.mov'); 	MakeQTMovie('size', [320 240]);	MakeQTMovie('quality', 1.0);	subplot(2,2,1);	for i=1:10		plot(sin((1:100)/4+i));		MakeQTMovie('addfigure');	end	MakeQTMovie('framerate', 10);	MakeQTMovie('addsound', sin(1:5000), 22050);	MakeQTMovie('debug');	MakeQTMovie('finish');	case 'quality'	if nargin < 2		fprintf('MakeQTMovie error: Need to specify a quality ');		fprintf('(between 0-1) with the quality command.\n');		return;	end	MakeQTMovieStatus.spatialQual = arg;otherwise	fprintf('MakeQTMovie: Unknown method %s.\n', cmd);end%%%%%%%%%%%%%%%  MakeDefaultQTMovieStatus %%%%%%%%%%%%%%%%%% Make the default movie status structure.function MakeDefaultQTMovieStatusglobal MakeQTMovieStatusif isempty(MakeQTMovieStatus)   MakeQTMovieStatus = struct(...      'frameRate', 10, ...	% frames per second      'frameStarts', [], ...  % Starting byte position      'frameLengths', [], ...      'timeScale', 10, ...	% How much faster does time run?      'soundRate', 22050, ... % Sound Sample Rate      'soundStart', [], ...	% Starting byte position      'soundLength', 0, ...      'soundChannels', 1, ...	% Number of channels      'frameNumber', 0, ...      'movieFp', [], ...		% File pointer       'imageTmp', tempname, ...      'movieName', 'output.mov', ...      'imageSize', [0 0], ...      'trackNumber', 0, ...      'timeScaleExpansion', 100, ...      'spatialQual', 1.0);	% Between 0.0 and 1.0end%%%%%%%%%%%%%%%  ImageSizeChanged %%%%%%%%%%%%%%%%%% Check to see if the image size has changed.  This m-file can't % deal with that, so we'll return an error.function err = ImageSizeChanged(newsize)global MakeQTMovieStatusnewsize = newsize(1:2);			% Don't care about RGB info, if presentoldsize = MakeQTMovieStatus.imageSize;err = 0;if sum(oldsize) == 0	MakeQTMovieStatus.imageSize = newsize;else	if sum(newsize ~= oldsize) > 0		fprintf('MakeQTMovie Error: New image size');		fprintf('(%dx%d) doesn''t match old size (%dx%d)\n', ...			newsize(1), newsize(2), oldsize(1), oldsize(2));		fprintf('   Can''t add this image to the movie.\n');		err = 1;	endend%%%%%%%%%%%%%%%  AddFileToMovie %%%%%%%%%%%%%%%%%% OK, we've saved out an image file.  Now add it to the end of the movie% file we are creating.% We'll copy the JPEG file in 16kbyte chunks to the end of the movie file.% Keep track of the start and end byte position in the file so we can put% the right information into the QT header.function [pos, len] = AddFileToMovie(imageTmp)global MakeQTMovieStatusOpenMovieFileif nargin < 1	imageTmp = MakeQTMovieStatus.imageTmp;endfp = fopen(imageTmp, 'rb');if fp < 0	error('Could not reopen QT image temporary file.');endlen = 0;pos = ftell(MakeQTMovieStatus.movieFp);while 1	data = fread(fp, 1024*16, 'uchar');	if isempty(data)		break;	end	cnt = fwrite(MakeQTMovieStatus.movieFp, data, 'uchar');	len = len + cnt;endfclose(fp);%%%%%%%%%%%%%%%  AddQTHeader %%%%%%%%%%%%%%%%%% Go back and write the atom information that allows% QuickTime to skip the image and sound data and find% its movie description information.function AddQTHeader()global MakeQTMovieStatuspos = ftell(MakeQTMovieStatus.movieFp);header = moov_atom;cnt = fwrite(MakeQTMovieStatus.movieFp, header, 'uchar');fseek(MakeQTMovieStatus.movieFp, 0, -1);cnt = fwrite(MakeQTMovieStatus.movieFp, mb32(pos), 'uchar');fclose(MakeQTMovieStatus.movieFp);MakeQTMovieStatus.movieFp = [];%%%%%%%%%%%%%%%  OpenMovieFile %%%%%%%%%%%%%%%%%% Open a new movie file.  Write out the initial QT header.  We'll fill in% the correct length later.function OpenMovieFileglobal MakeQTMovieStatusif isempty(MakeQTMovieStatus.movieFp)	fp = fopen(MakeQTMovieStatus.movieName, 'wb');	if fp < 0		error('Could not open QT movie output file.');	end	MakeQTMovieStatus.movieFp = fp;	cnt = fwrite(fp, [mb32(0) mbstring('mdat')], 'uchar');end%%%%%%%%%%%%%%%  writejpg_map %%%%%%%%%%%%%%%%%% Like the imwrite routine, but first pass the image data through the indicated% RGB map.function writejpg_map(name,I,map)global MakeQTMovieStatus[y,x] = size(I);% Force values to be valid indexes.  This fixes a bug that occasionally % occurs in frame2im in Matlab 5.2 which incorrectly produces values of I % equal to zero.I = max(1,min(I,size(map,1)));rgb = zeros(y, x, 3);t = zeros(y,x);t(:) = map(I(:),1)*255; rgb(:,:,1) = t;t(:) = map(I(:),2)*255; rgb(:,:,2) = t;t(:) = map(I(:),3)*255; rgb(:,:,3) = t;imwrite(uint8(rgb),name,'jpeg','Quality',MakeQTMovieStatus.spatialQual*100);%%%%%%%%%%%%%%%  SetAtomSize %%%%%%%%%%%%%%%%%% Fill in the size of the atomfunction y=SetAtomSize(x)y = x;y(1:4) = mb32(length(x));%%%%%%%%%%%%%%%  mb32 %%%%%%%%%%%%%%%%%% Make a vector from a 32 bit integerfunction y = mb32(x)				if size(x,1) > size(x,2)	x = x';endy = [bitand(bitshift(x,-24),255); ...     bitand(bitshift(x,-16),255); ...     bitand(bitshift(x, -8),255); ...     bitand(x,              255)];y = y(:)';%%%%%%%%%%%%%%%  mb16 %%%%%%%%%%%%%%%%%% Make a vector from a 16 bit integerfunction y = mb16(x)if size(x,1) > size(x,2)	x = x';endy = [bitand(bitshift(x, -8),255); ...     bitand(x,              255)];y = y(:)';%%%%%%%%%%%%%%%  mb8 %%%%%%%%%%%%%%%%%% Make a vector from a 8 bit integerfunction y = mb8(x)if size(x,1) > size(x,2)	x = x';endy = [bitand(x,              255)];y = y(:)';%% The following routines all create atoms necessary% to describe a QuickTime Movie. The basic idea is to% fill in the necessary data, all converted to 8 bit % characters, then fix it up later with SetAtomSize so% that it has the correct header.  (This is easier than% counting by hand.)%%%%%%%%%%%%%%%  mbstring %%%%%%%%%%%%%%%%%% Make a vector from a character stringfunction y = mbstring(s)y = double(s);%%%%%%%%%%%%%%%  dinf_atom %%%%%%%%%%%%%%%%%function y = dinf_atom()y = SetAtomSize([mb32(0) mbstring('dinf') dref_atom]);%%%%%%%%%%%%%%%  dref_atom %%%%%%%%%%%%%%%%%function y = dref_atom()y = SetAtomSize([mb32(0) mbstring('dref') mb32(0) mb32(1) ...		mb32(12) mbstring('alis') mb32(1)]);%%%%%%%%%%%%%%%  edts_atom %%%%%%%%%%%%%%%%%function y = edts_atom(add_sound_p)global MakeQTMovieStatusfixed1 = bitshift(1,16);			% Fixed point 1if add_sound_p > 0	duration = MakeQTMovieStatus.soundLength / ...			MakeQTMovieStatus.soundRate * ...			MakeQTMovieStatus.timeScale;else	duration = MakeQTMovieStatus.frameNumber / ...			MakeQTMovieStatus.frameRate * ...			MakeQTMovieStatus.timeScale;endduration = ceil(duration);y = [mb32(0) ...				% Atom Size     mbstring('edts') ...			% Atom Name     SetAtomSize([mb32(0) ...			% Atom Size		  mbstring('elst') ...		% Atom Name		  mb32(0) ...			% Version/Flags		  mb32(1) ...			% Number of entries		  mb32(duration) ...		% Length of this track		  mb32(0) ...			% Time		  mb32(fixed1)])];		% Ratey = SetAtomSize(y);%%%%%%%%%%%%%%%  hdlr_atom %%%%%%%%%%%%%%%%%function y = hdlr_atom(component_type, sub_type)if strcmp(sub_type, 'vide')	type_string = 'Apple Video Media Handler';elseif strcmp(sub_type, 'alis')	type_string = 'Apple Alias Data Handler';elseif strcmp(sub_type, 'soun')	type_string = 'Apple Sound Media Handler';endy = [mb32(0) ...				% Atom Size     mbstring('hdlr') ...			% Atom Name     mb32(0) ...				% Version and Flags     mbstring(component_type) ...		% Component Name     mbstring(sub_type) ...			% Sub Type Name     mbstring('appl') ...			% Component manufacturer     mb32(0) ...				% Component flags     mb32(0) ...				% Component flag mask     mb8(length(type_string)) ...		% Type Name byte count     mbstring(type_string)];			% Type Namey = SetAtomSize(y);%%%%%%%%%%%%%%%  mdhd_atom %%%%%%%%%%%%%%%%%function y = mdhd_atom(add_sound_p)global MakeQTMovieStatusif add_sound_p	data = [mb32(MakeQTMovieStatus.soundRate)  ...		mb32(MakeQTMovieStatus.soundLength)];else	data = [mb32(MakeQTMovieStatus.frameRate * ...			MakeQTMovieStatus.timeScaleExpansion)  ...		mb32(MakeQTMovieStatus.frameNumber * ...			MakeQTMovieStatus.timeScaleExpansion)];endy = [mb32(0) mbstring('mdhd') ...		% Atom Header     mb32(0) ...     mb32(round(now*3600*24)) ...		% Creation time     mb32(round(now*3600*24)) ...		% Modification time     data ...     mb16(0) mb16(0)];y = SetAtomSize(y); %%%%%%%%%%%%%%%  mdia_atom %%%%%%%%%%%%%%%%%function y = mdia_atom(add_sound_p)global MakeQTMovieStatus if add_sound_p	hdlr = hdlr_atom('mhlr', 'soun');else	hdlr = hdlr_atom('mhlr', 'vide');endy = [mb32(0) mbstring('mdia') ...		% Atom Header     mdhd_atom(add_sound_p) ...     hdlr ...					% Handler Atom     minf_atom(add_sound_p)];y = SetAtomSize(y);%%%%%%%%%%%%%%%  minf_atom %%%%%%%%%%%%%%%%%function y = minf_atom(add_sound_p)global MakeQTMovieStatus if add_sound_p	data = smhd_atom;else	data = vmhd_atom;endy = [mb32(0) mbstring('minf') ...		% Atom Header     data ...     hdlr_atom('dhlr','alis') ...     dinf_atom ...     stbl_atom(add_sound_p)];y = SetAtomSize(y);%%%%%%%%%%%%%%%  moov_atom %%%%%%%%%%%%%%%%%function y=moov_atomglobal MakeQTMovieStatusMakeQTMovieStatus.timeScale = MakeQTMovieStatus.frameRate * ...				MakeQTMovieStatus.timeScaleExpansion;if MakeQTMovieStatus.soundLength > 0	sound = trak_atom(1);else	sound = [];endy = [mb32(0) mbstring('moov') ...     mvhd_atom udat_atom sound trak_atom(0) ];y = SetAtomSize(y);%%%%%%%%%%%%%%%  mvhd_atom %%%%%%%%%%%%%%%%%function y=mvhd_atomglobal MakeQTMovieStatusfixed1 = bitshift(1,16);			% Fixed point 1frac1 = bitshift(1,30);				% Fractional 1if length(MakeQTMovieStatus.soundStart) > 0			NumberOfTracks = 2;else	NumberOfTracks = 1;end					% Need to make sure its longer					% of movie and sound lengthsMovieDuration = max(MakeQTMovieStatus.frameNumber / ...			MakeQTMovieStatus.frameRate, ...		    MakeQTMovieStatus.soundLength / ...			MakeQTMovieStatus.soundRate);MovieDuration = ceil(MovieDuration * MakeQTMovieStatus.timeScale);y = [mb32(0) ...			% Size     mbstring('mvhd') ...		% Movie Data     mb32(0) ...			% Version and Flags     mb32(0) ...			% Creation Time (unknown)     mb32(0) ...			% Modification Time (unknown)     mb32(MakeQTMovieStatus.timeScale) ...	% Movie's Time Scale     mb32(MovieDuration) ...		% Movie Duration      mb32(fixed1) ...			% Preferred Rate     mb16(255) ...			% Preferred Volume     mb16(0) ...			% Fill     mb32(0) ...			% Fill     mb32(0) ...			% Fill     mb32(fixed1) mb32(0) mb32(0) ...	% Transformation matrix (identity)     mb32(0) mb32(fixed1) mb32(0) ...     mb32(0) mb32(0) mb32(frac1) ...     mb32(0) ...			% Preview Time     mb32(0) ...			% Preview Duration     mb32(0) ...			% Poster Time     mb32(0) ...			% Selection Time     mb32(0) ...			% Selection Duration     mb32(0) ...			% Current Time     mb32(NumberOfTracks)];		% Video and/or Sound?y = SetAtomSize(y);%%%%%%%%%%%%%%%  raw_image_description %%%%%%%%%%%%%%%%%function y = raw_image_description()global MakeQTMovieStatusfixed1 = bitshift(1,16);			% Fixed point 1codec = [12 'Photo - JPEG                   '];y = [mb32(0) mbstring('jpeg') ...		% Atom Header     mb32(0) mb16(0) mb16(0) mb16(0) mb16(1) ...     mbstring('appl') ...     mb32(1023) ...				% Temporal Quality (perfect)     mb32(floor(1023*MakeQTMovieStatus.spatialQual)) ...     mb16(MakeQTMovieStatus.imageSize(2)) ...     mb16(MakeQTMovieStatus.imageSize(1)) ...     mb32(fixed1 * 72) mb32(fixed1 * 72) ...     mb32(0) ...     mb16(0) ...     mbstring(codec) ...     mb16(24) mb16(65535)];y = SetAtomSize(y);%%%%%%%%%%%%%%%  raw_sound_description %%%%%%%%%%%%%%%%%function y = raw_sound_description()global MakeQTMovieStatusy = [mb32(0) mbstring('twos') ...		% Atom Header     mb32(0) mb16(0) mb16(0) mb16(0) mb16(0) ...     mb32(0) ...     mb16(MakeQTMovieStatus.soundChannels) ...     mb16(16) ...				% 16 bits per sample     mb16(0) mb16(0) ...     mb32(round(MakeQTMovieStatus.soundRate*65536))];y = SetAtomSize(y);%%%%%%%%%%%%%%%  smhd_atom %%%%%%%%%%%%%%%%%function y = smhd_atom()y = SetAtomSize([mb32(0) mbstring('smhd') mb32(0) mb16(0) mb16(0)]);%%%%%%%%%%%%%%%  stbl_atom %%%%%%%%%%%%%%%%%% Removed the stss atom since it seems to upset the PC version of QT% and it is empty so it doesn't add anything.% Malcolm - July 5, 1999function y = stbl_atom(add_sound_p)y = [mb32(0) mbstring('stbl') ...		% Atom Header     stsd_atom(add_sound_p) ...     stts_atom(add_sound_p) ...     stsc_atom(add_sound_p) ...     stsz_atom(add_sound_p) ...     stco_atom(add_sound_p)];y = SetAtomSize(y);%%%%%%%%%%%%%%%  stco_atom %%%%%%%%%%%%%%%%%function y = stco_atom(add_sound_p)global MakeQTMovieStatusif add_sound_p	y = [mb32(0) mbstring('stco') mb32(0) mb32(1) ...	     mb32(MakeQTMovieStatus.soundStart)];else	y = [mb32(0) mbstring('stco') mb32(0) ...	     mb32(MakeQTMovieStatus.frameNumber) ...	     mb32(MakeQTMovieStatus.frameStarts)];endy = SetAtomSize(y);%%%%%%%%%%%%%%%  stsc_atom %%%%%%%%%%%%%%%%%function y = stsc_atom(add_sound_p)global MakeQTMovieStatusif add_sound_p	samplesperchunk = MakeQTMovieStatus.soundLength;else	samplesperchunk = 1;endy = [mb32(0) mbstring('stsc') mb32(0) mb32(1)  ...     mb32(1) mb32(samplesperchunk) mb32(1)];y = SetAtomSize(y);%%%%%%%%%%%%%%%  stsd_atom %%%%%%%%%%%%%%%%%function y = stsd_atom(add_sound_p)if add_sound_p	desc = raw_sound_description;else	desc = raw_image_description;endy = [mb32(0) mbstring('stsd') mb32(0) mb32(1) desc];y = SetAtomSize(y);%%%%%%%%%%%%%%%  stss_atom %%%%%%%%%%%%%%%%%function y = stss_atom()y = SetAtomSize([mb32(0) mbstring('stss') mb32(0) mb32(0)]);%%%%%%%%%%%%%%%  stsz_atom %%%%%%%%%%%%%%%%%function y = stsz_atom(add_sound_p)global MakeQTMovieStatusif add_sound_p	y = [mb32(0) mbstring('stsz') mb32(0) mb32(2) ...	     mb32(MakeQTMovieStatus.soundLength)];else	y = [mb32(0) mbstring('stsz') mb32(0) mb32(0) ...	     mb32(MakeQTMovieStatus.frameNumber) ...	     mb32(MakeQTMovieStatus.frameLengths)];endy = SetAtomSize(y);%%%%%%%%%%%%%%%  stts_atom %%%%%%%%%%%%%%%%%function y = stts_atom(add_sound_p)global MakeQTMovieStatusif add_sound_p	count_duration = [mb32(MakeQTMovieStatus.soundLength) mb32(1)];else	count_duration = [mb32(MakeQTMovieStatus.frameNumber) ...		mb32(MakeQTMovieStatus.timeScaleExpansion)];endy = SetAtomSize([mb32(0) mbstring('stts') mb32(0) mb32(1) count_duration]);%%%%%%%%%%%%%%%  trak_atom %%%%%%%%%%%%%%%%%function y = trak_atom(add_sound_p)global MakeQTMovieStatusy = [mb32(0) mbstring('trak') ...		% Atom Header	tkhd_atom(add_sound_p) ...		% Track header	edts_atom(add_sound_p) ...		% Edit List	mdia_atom(add_sound_p)];y = SetAtomSize(y);%%%%%%%%%%%%%%%  tkhd_atom %%%%%%%%%%%%%%%%%function y = tkhd_atom(add_sound_p)global MakeQTMovieStatusfixed1 = bitshift(1,16);			% Fixed point 1frac1 = bitshift(1,30);				% Fractional 1 (CHECK THIS)if add_sound_p > 0	duration = MakeQTMovieStatus.soundLength / ...			MakeQTMovieStatus.soundRate * ...			MakeQTMovieStatus.timeScale;else	duration = MakeQTMovieStatus.frameNumber / ...			MakeQTMovieStatus.frameRate * ...			MakeQTMovieStatus.timeScale;endduration = ceil(duration);y = [mb32(0) mbstring('tkhd') ...	% Atom Header     mb32(15) ...			% Version and flags     mb32(round(now*3600*24)) ...	% Creation time     mb32(round(now*3600*24)) ...	% Modification time     mb32(MakeQTMovieStatus.trackNumber) ...     mb32(0) ...     mb32(duration) ...			% Track duration     mb32(0) mb32(0) ...		% Offset and priority     mb16(0) mb16(0) mb16(255) mb16(0) ...	% Layer, Group, Volume, fill     mb32(fixed1) mb32(0) mb32(0) ...	% Transformation matrix (identity)     mb32(0) mb32(fixed1) mb32(0) ...     mb32(0) mb32(0) mb32(frac1)];if add_sound_p	y = [y mb32(0) mb32(0)];	% Zeros for soundelse	y = [y mb32(fliplr(MakeQTMovieStatus.imageSize)*fixed1)];endy= SetAtomSize(y);MakeQTMovieStatus.trackNumber = MakeQTMovieStatus.trackNumber + 1;%%%%%%%%%%%%%%%  udat_atom %%%%%%%%%%%%%%%%%function y = udat_atom()atfmt = [64 double('fmt')];atday = [64 double('day')];VersionString = 'Matlab MakeQTMovie version April 7, 2000';y = [mb32(0) mbstring('udta') ...	SetAtomSize([mb32(0) atfmt mbstring(['Created ' VersionString])]) ...	SetAtomSize([mb32(0) atday '  ' date])];y = SetAtomSize(y);%%%%%%%%%%%%%%%  vmhd_atom %%%%%%%%%%%%%%%%%function y = vmhd_atom()y = SetAtomSize([mb32(0) mbstring('vmhd') mb32(0) ...    mb16(64) ...			% Graphics Mode    mb16(0) mb16(0) mb16(0)]);		% Op Color
+##### SOURCE END #####
+--></body></html>
