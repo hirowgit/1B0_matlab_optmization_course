@@ -95,13 +95,13 @@ posU(7)=cellfun(@(x) [x,x(:,1)],posU(7),'UniformOutput',false);
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 figure(fignum); clf;
-set(fignum,'Position',[560   500   800   450]); hold on;
+% set(fignum,'Position',[560   500   800   450]); 
+hold on;
 
 spbtn = uicontrol('Style','pushbutton','Units','normalized',...
         'Position',[.93  .2  .05  .1],'String','Stop it');
 set(spbtn,'interruptible','on','Callback','itr = 0;');
-% set(98,'doublebuffer','on');
-% set(99,'doublebuffer','on');
+set(fignum,'doublebuffer','on');
 set(gca,'drawmode','fast');
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
