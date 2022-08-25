@@ -9,7 +9,7 @@ Bronze
 Copper 
 Silver
 Gold
-Platimum
+Platinum
 Palladium
 Triangle
 Square
